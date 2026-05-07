@@ -216,7 +216,33 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
 /* LIST EDITOR (for LSR, Induction, Policy items) */
 .list-edit-item{background:var(--bg3);border:.5px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-bottom:7px;position:relative;}
 .list-edit-item .del-item{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--er);cursor:pointer;font-size:13px;}
-@media(max-width:780px){.sbnav{display:none;}.fr{grid-template-columns:1fr;}}
+/* MOBILE NAV */
+.mob-nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+.mob-nav-overlay.open{display:block;}
+.mob-bottom-bar{display:none;position:fixed;bottom:0;left:0;right:0;height:58px;background:var(--bg2);border-top:.5px solid var(--bd);z-index:30;padding:0 4px;align-items:center;justify-content:space-around;}
+.mob-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;background:transparent;border:none;color:var(--tx2);cursor:pointer;font-family:var(--f);font-size:9px;font-weight:500;letter-spacing:.03em;border-radius:var(--r);flex:1;transition:.15s;}
+.mob-btn:hover,.mob-btn.active{color:var(--ac);background:var(--acb);}
+.mob-btn svg{width:18px;height:18px;}
+.mob-side-panel{position:fixed;left:0;top:0;bottom:0;width:280px;background:var(--sb);z-index:50;overflow-y:auto;transform:translateX(-100%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.2);}
+.mob-side-panel.open{transform:translateX(0);}
+.mob-side-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--bd);}
+.mob-side-close{background:transparent;border:none;color:var(--tx2);cursor:pointer;font-size:20px;line-height:1;}
+@media(max-width:780px){
+  .sbnav{display:none;}
+  .fr{grid-template-columns:1fr;}
+  .mob-bottom-bar{display:flex;}
+  #app{padding-bottom:58px;}
+  .topbar .tbm{display:none;}
+  .mob-side-panel .ssec{padding:9px 14px 3px;}
+  .mob-side-panel .sbl{padding:8px 14px 8px 22px;font-size:13px;}
+  .mob-side-panel .sbl-top{padding:8px 14px;font-size:13px;}
+  .mob-side-panel .sb-cat{padding:10px 14px 4px;}
+  .mob-side-panel .sb-divider{margin:5px 0;}
+}
+@media(min-width:781px){
+  .mob-side-panel{display:none!important;}
+  .mob-nav-overlay{display:none!important;}
+}
 </style>
 </head>
 <body>
@@ -261,6 +287,55 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
     </div>
   </div>
   <div class="lft"><span class="dot"></span>SYSTEM ONLINE &nbsp;|&nbsp; <span id="lclk">--:-- UTC</span></div>
+</div>
+
+<!-- MOBILE OVERLAY -->
+<div class="mob-nav-overlay" id="mob-overlay" onclick="closeMobNav()"></div>
+
+<!-- MOBILE SIDE PANEL (copy of sidebar) -->
+<div class="mob-side-panel" id="mob-panel">
+  <div class="mob-side-header">
+    <div style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066cc" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M3 15C7 11 10 16 12 13 14 10 17 15 21 11" stroke-linecap="round"/></svg>
+      Caspian Voyager
+    </div>
+    <button class="mob-side-close" onclick="closeMobNav()">✕</button>
+  </div>
+  <div style="padding:6px 0;">
+    <button class="sbl-top" onclick="msp('dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</button>
+    <button class="sbl-top" onclick="msp('about')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Haqqımızda</button>
+    <div class="sb-divider"></div>
+    <div class="sb-cat open" onclick="toggleCat(this)"><span class="sb-cat-label">🛡️ HSSEQ</span><span class="sb-cat-arrow">▾</span></div>
+    <div class="sb-sub open">
+      <button class="sbl" onclick="msp('hsseq')">Overview</button>
+      <button class="sbl" onclick="msp('induction')">Induction</button>
+      <button class="sbl" onclick="msp('lsr')">Life Saving Rules</button>
+      <button class="sbl" onclick="msp('policies')">Policies</button>
+      <button class="sbl" onclick="msp('muster')">Muster List</button>
+      <button class="sbl" onclick="msp('checklist')">Daily Checklist</button>
+      <button class="sbl" onclick="msp('permit')">Permit to Work</button>
+      <button class="sbl" onclick="msp('report')">Incident Report</button>
+      <button class="sbl" onclick="msp('query')">Anonymous Query</button>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-cat open" onclick="toggleCat(this)"><span class="sb-cat-label">📚 Knowledge</span><span class="sb-cat-arrow">▾</span></div>
+    <div class="sb-sub open">
+      <button class="sbl" onclick="msp('ll')">Lesson Learned</button>
+      <button class="sbl" onclick="msp('flash')">Safety Flashes</button>
+      <button class="sbl" onclick="msp('manuals')">Manuals</button>
+      <button class="sbl" onclick="msp('symbols')">Symbols</button>
+      <button class="sbl" onclick="msp('lifting')">Lifting Equipment</button>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-cat open" onclick="toggleCat(this)"><span class="sb-cat-label">🔧 Maintenance</span><span class="sb-cat-arrow">▾</span></div>
+    <div class="sb-sub open"><button class="sbl" onclick="msp('wo')">Work Orders</button></div>
+    <div id="mob-admin-sb" style="display:none;">
+      <div class="sb-divider"></div>
+      <div class="sb-cat open" onclick="toggleCat(this)"><span class="sb-cat-label">⚙️ Admin</span><span class="sb-cat-arrow">▾</span></div>
+      <div class="sb-sub open"><button class="sbl" onclick="msp('admin')">Admin Panel</button></div>
+    </div>
+    <div id="mob-dyn-items"></div>
+  </div>
 </div>
 
 <!-- APP -->
@@ -617,6 +692,30 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
 
     </main>
   </div>
+
+  <!-- MOBILE BOTTOM BAR -->
+  <div class="mob-bottom-bar">
+    <button class="mob-btn" onclick="msp('dash')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="mob-btn" onclick="msp('hsseq')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      HSSEQ
+    </button>
+    <button class="mob-btn" onclick="msp('wo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+      Work Orders
+    </button>
+    <button class="mob-btn" onclick="msp('permit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Permits
+    </button>
+    <button class="mob-btn" onclick="openMobNav()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Menu
+    </button>
+  </div>
 </div>
 <!-- MODALS -->
 <div class="modal-overlay" id="ll-modal"><div class="modal">
@@ -649,7 +748,12 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   <div class="fr"><div class="fg"><label>Code (e.g. F-EX)</label><input id="sym-code" type="text"/></div><div class="fg"><label>Category</label><input id="sym-cat" type="text" placeholder="Fire, LSA, Hazard..."/></div></div>
   <div class="fr full"><div class="fg"><label>Name</label><input id="sym-name" type="text"/></div></div>
   <div class="fr full"><div class="fg"><label>Detailed Info (shown on click — use newlines freely)</label><textarea id="sym-detail" style="min-height:140px;"></textarea></div></div>
-  <div class="fr"><div class="fg"><label>Background Color</label><input id="sym-bg" type="color" value="#ffeeed" style="height:36px;padding:2px;"/></div><div class="fg"><label>SVG Inner HTML (optional)</label><input id="sym-svg" type="text" placeholder="Leave blank for default icon"/></div></div>
+  <div style="background:var(--acb);border:.5px solid var(--ac);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--act);">
+    📸 <strong>Image options:</strong> Paste a direct image URL below, OR upload to Supabase Storage and paste the public URL. The image will show as the symbol icon.
+  </div>
+  <div class="fr full"><div class="fg"><label>Image URL (paste direct link to PNG/JPG/SVG)</label><input id="sym-img-url" type="text" placeholder="https://... or leave blank to use color block" oninput="prevSymImg(this.value)"/></div></div>
+  <div class="fr"><div class="fg"><label>Background Color (if no image)</label><input id="sym-bg" type="color" value="#ffeeed" style="height:36px;padding:2px;"/></div><div class="fg"><label>Custom SVG code (advanced, optional)</label><input id="sym-svg" type="text" placeholder="Leave blank if using image URL"/></div></div>
+  <div id="sym-img-preview" style="margin-top:8px;"></div>
   <div class="brow"><button class="bs p" onclick="saveSym()">Save Symbol</button><button class="bs" onclick="closeModal('sym-modal')">Cancel</button></div>
 </div></div>
 
@@ -705,6 +809,11 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   <div class="brow"><button class="bs p" onclick="savePage()">Save Page</button><button class="bs" onclick="closeModal('page-modal')">Cancel</button></div>
 </div></div>
 <script>
+// ===== MOBILE NAV =====
+function openMobNav(){document.getElementById('mob-panel').classList.add('open');document.getElementById('mob-overlay').classList.add('open');}
+function closeMobNav(){document.getElementById('mob-panel').classList.remove('open');document.getElementById('mob-overlay').classList.remove('open');}
+function msp(id){closeMobNav();sp(id);}
+
 // ===== SUPABASE =====
 const SURL='https://teubksvuicclerrtqjhq.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRldWJrc3Z1aWNjbGVycnRxamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTE4MzUsImV4cCI6MjA5MzQ4NzgzNX0.-UzzgaPZHoe1P17jtr6F2M_bBEk4g27MTybWRNicCK4';
@@ -794,6 +903,7 @@ function openApp(){
   document.getElementById('uchip').innerHTML=`<span class="chip chipb">${CU.rank} · ${CU.full_name}</span>`;
   if(CU.is_admin){
     document.getElementById('admn-sb').style.display='block';
+    const mobAdm=document.getElementById('mob-admin-sb');if(mobAdm)mobAdm.style.display='block';
     ['ll-add-btn','fl-add-btn','sym-add-btn','man-add-btn','ind-edit-btn','lsr-edit-btn','pol-edit-btn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='block';});
   }
   loadDynPages();
@@ -1143,23 +1253,67 @@ async function loadSymbols(){
   try{
     const syms=await sGet('cv_symbols','?order=sort_order.asc,created_at.asc&select=*');
     if(!syms.length){grid.innerHTML='<div style="font-size:12px;color:var(--tx2);">No symbols yet. Admin can add symbols.</div>';return;}
-    grid.innerHTML=syms.map(s=>`<div class="imoc"><div class="imov" style="background:${s.bg_color||'#f5f5f5'};" onclick="togSym('imod-${s.id}')"><svg viewBox="0 0 80 80" width="76" height="76">${s.svg_content||`<rect width="80" height="80" rx="4" fill="#888"/><text x="40" y="35" text-anchor="middle" fill="white" font-size="10" font-family="monospace">${s.code}</text><text x="40" y="50" text-anchor="middle" fill="white" font-size="9" font-family="monospace">${s.name.substring(0,12)}</text>`}</svg></div><div class="imoi" onclick="togSym('imod-${s.id}')"><div class="imocod">${s.code} · ${s.category||''}</div><div class="imon">${s.name}</div><div style="font-size:10px;color:var(--ac);margin-top:2px;">Click for details ▾</div></div>${CU.is_admin?`<div style="padding:5px 10px;border-top:.5px solid var(--bd);display:flex;gap:5px;"><button class="abt" style="font-size:10px;" onclick="editSym('${s.id}',${JSON.stringify(JSON.stringify(s))})">Edit</button><button class="abt" style="font-size:10px;color:var(--er);" onclick="deleteSym('${s.id}')">Delete</button></div>`:''}<div class="imod" id="imod-${s.id}">${s.detail||'No detail added.'}</div></div>`).join('');
+    grid.innerHTML=syms.map(s=>{
+      // Visual: image_url > svg_content > color block with text
+      let visual='';
+      if(s.image_url){
+        visual=`<img src="${s.image_url}" style="width:76px;height:76px;object-fit:contain;border-radius:4px;" onerror="this.style.display='none'"/>`;
+      } else if(s.svg_content){
+        visual=`<svg viewBox="0 0 80 80" width="76" height="76">${s.svg_content}</svg>`;
+      } else {
+        visual=`<div style="width:76px;height:76px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;text-align:center;padding:4px;">${s.code}</div>`;
+      }
+      return `<div class="imoc"><div class="imov" style="background:${s.bg_color||'#555'};" onclick="togSym('imod-${s.id}')">${visual}</div><div class="imoi" onclick="togSym('imod-${s.id}')"><div class="imocod">${s.code} · ${s.category||''}</div><div class="imon">${s.name}</div><div style="font-size:10px;color:var(--ac);margin-top:2px;">Click for details ▾</div></div>${CU.is_admin?`<div style="padding:5px 10px;border-top:.5px solid var(--bd);display:flex;gap:5px;"><button class="abt" style="font-size:10px;" onclick="editSym('${s.id}',${JSON.stringify(JSON.stringify(s))})">Edit</button><button class="abt" style="font-size:10px;color:var(--er);" onclick="deleteSym('${s.id}')">Delete</button></div>`:''}<div class="imod" id="imod-${s.id}">${s.detail||'No detail added.'}</div></div>`;
+    }).join('');
   }catch(e){grid.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
 }
 function togSym(id){const el=document.getElementById(id);if(el)el.classList.toggle('op');}
-function openSymModal(){document.getElementById('sym-id').value='';document.getElementById('sym-modal-title').innerHTML='Add Symbol <button class="modal-close" onclick="closeModal(\'sym-modal\')">✕</button>';openModal('sym-modal');}
+function prevSymImg(url){const prev=document.getElementById('sym-img-preview');if(!prev)return;if(url)prev.innerHTML=`<div style="margin-top:8px;"><div style="font-size:10px;color:var(--tx3);margin-bottom:4px;">Preview:</div><img src="${url}" style="height:80px;border-radius:var(--r);border:.5px solid var(--bd);" onerror="this.parentElement.innerHTML='<div style=font-size:11px;color:var(--er);>Cannot load image. Check URL.</div>'"/></div>`;else prev.innerHTML='';}
+function openSymModal(){
+  document.getElementById('sym-id').value='';
+  document.getElementById('sym-code').value='';
+  document.getElementById('sym-cat').value='';
+  document.getElementById('sym-name').value='';
+  document.getElementById('sym-detail').value='';
+  document.getElementById('sym-img-url').value='';
+  document.getElementById('sym-bg').value='#ffeeed';
+  document.getElementById('sym-svg').value='';
+  document.getElementById('sym-img-preview').innerHTML='';
+  document.getElementById('sym-modal-title').innerHTML='Add Symbol <button class="modal-close" onclick="closeModal(\'sym-modal\')">✕</button>';
+  openModal('sym-modal');
+}
 function editSym(id,encoded){
   const s=JSON.parse(JSON.parse(encoded));
   document.getElementById('sym-id').value=id;
   document.getElementById('sym-modal-title').innerHTML='Edit Symbol <button class="modal-close" onclick="closeModal(\'sym-modal\')">✕</button>';
-  document.getElementById('sym-code').value=s.code||'';document.getElementById('sym-cat').value=s.category||'';document.getElementById('sym-name').value=s.name||'';document.getElementById('sym-detail').value=s.detail||'';document.getElementById('sym-bg').value=s.bg_color||'#ffeeed';document.getElementById('sym-svg').value=s.svg_content||'';
+  document.getElementById('sym-code').value=s.code||'';
+  document.getElementById('sym-cat').value=s.category||'';
+  document.getElementById('sym-name').value=s.name||'';
+  document.getElementById('sym-detail').value=s.detail||'';
+  document.getElementById('sym-img-url').value=s.image_url||'';
+  document.getElementById('sym-bg').value=s.bg_color||'#ffeeed';
+  document.getElementById('sym-svg').value=s.svg_content||'';
+  const prev=document.getElementById('sym-img-preview');
+  if(prev&&s.image_url)prev.innerHTML=`<img src="${s.image_url}" style="height:80px;border-radius:var(--r);border:.5px solid var(--bd);margin-top:5px;" onerror="this.style.display='none'"/>`;
   openModal('sym-modal');
 }
 async function saveSym(){
-  const data={code:document.getElementById('sym-code').value.trim(),category:document.getElementById('sym-cat').value.trim(),name:document.getElementById('sym-name').value.trim(),detail:document.getElementById('sym-detail').value.trim(),bg_color:document.getElementById('sym-bg').value,svg_content:document.getElementById('sym-svg').value.trim()};
+  const data={
+    code:document.getElementById('sym-code').value.trim(),
+    category:document.getElementById('sym-cat').value.trim(),
+    name:document.getElementById('sym-name').value.trim(),
+    detail:document.getElementById('sym-detail').value.trim(),
+    image_url:document.getElementById('sym-img-url').value.trim(),
+    bg_color:document.getElementById('sym-bg').value,
+    svg_content:document.getElementById('sym-svg').value.trim()
+  };
   if(!data.code||!data.name){alert('Code and name required.');return;}
-  try{const eid=document.getElementById('sym-id').value;if(eid)await sPatch('cv_symbols',`?id=eq.${eid}`,data);else await sPost('cv_symbols',data);closeModal('sym-modal');loadSymbols();}
-  catch(e){alert('Error: '+e.message);}
+  try{
+    const eid=document.getElementById('sym-id').value;
+    if(eid)await sPatch('cv_symbols',`?id=eq.${eid}`,data);
+    else await sPost('cv_symbols',data);
+    closeModal('sym-modal');loadSymbols();
+  }catch(e){alert('Error: '+e.message);}
 }
 async function deleteSym(id){if(!confirm('Delete this symbol?'))return;await sDel('cv_symbols',`?id=eq.${id}`);loadSymbols();}
 
@@ -1231,9 +1385,11 @@ async function loadDynPages(){
   try{
     const pages=await sGet('cv_pages','?active=eq.true&order=sort_order.asc,title.asc&select=*');
     const sb=document.getElementById('dyn-sb-items');const sec=document.getElementById('dyn-sb-section');
+    const mobItems=document.getElementById('mob-dyn-items');
     if(!pages.length){if(sec)sec.style.display='none';return;}
     if(sec)sec.style.display='block';
     if(sb)sb.innerHTML=pages.map(p=>`<button class="sbl" onclick="sp('dynpage','${p.id}')">${p.icon||'📄'} ${p.title}</button>`).join('');
+    if(mobItems)mobItems.innerHTML=`<div class="sb-divider"></div><div class="sb-cat open" onclick="toggleCat(this)"><span class="sb-cat-label">📄 Custom Pages</span><span class="sb-cat-arrow">▾</span></div><div class="sb-sub open">${pages.map(p=>`<button class="sbl" onclick="msp('dynpage');setTimeout(()=>loadDynPage('${p.id}'),100)">${p.icon||'📄'} ${p.title}</button>`).join('')}</div>`;
   }catch(e){console.error('DynPages:',e);}
 }
 async function loadDynPage(id){
