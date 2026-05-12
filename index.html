@@ -1621,9 +1621,14 @@ async function togReadLog(elId,type,id){
   if(el.style.display==='block'){el.style.display='none';return;}
   el.style.display='block';el.innerHTML='<div class="loading"><div class="spin"></div></div>';
   try{
-    const tbl=type==='lesson'?'cv_lesson_reads':'cv_flash_reads';
-    const fld=type==='lesson'?'lesson_id':'flash_id';
-    const reads=await sGet(tbl,`?${fld}=eq.${id}&order=read_at.desc&select=*`);
+    let reads=[];
+    if(type==='manual'){
+      reads=await sGet('cv_manual_reads',`?manual_id=eq.${id}&order=read_at.desc&select=*`);
+    } else {
+      const tbl=type==='lesson'?'cv_lesson_reads':'cv_flash_reads';
+      const fld=type==='lesson'?'lesson_id':'flash_id';
+      reads=await sGet(tbl,`?${fld}=eq.${id}&order=read_at.desc&select=*`);
+    }
     el.innerHTML=reads.length?`<div class="read-log">${reads.map(r=>`<div style="padding:2px 0;font-size:10px;">✓ ${r.read_by} — ${new Date(r.read_at).toLocaleString()}</div>`).join('')}</div>`:'<div style="font-size:11px;color:var(--tx3);">No reads logged yet.</div>';
   }catch{el.innerHTML='';}
 }
@@ -1691,18 +1696,6 @@ async function loadManuals(){
 async function markManRead(id,title){
   try{await sPost('cv_manual_reads',{manual_id:id,read_by:CU.full_name,read_at:new Date().toISOString()});alert(`"${title}" marked as read.`);}
   catch(e){alert('Error: '+e.message);}
-}
-async function togReadLog2(elId,manId){
-  const el=document.getElementById(elId);if(!el)return;
-  if(el.style.display==='block'){el.style.display='none';return;}
-  el.style.display='block';el.innerHTML='<div class="loading"><div class="spin"></div></div>';
-  try{const reads=await sGet('cv_manual_reads',`?manual_id=eq.${manId}&order=read_at.desc&select=*`);el.innerHTML=reads.length?`<div class="read-log">${reads.map(r=>`<div style="padding:2px 0;font-size:10px;">✓ ${r.read_by} — ${new Date(r.read_at).toLocaleString()}</div>`).join('')}</div>`:'<div style="font-size:11px;color:var(--tx3);">No reads.</div>';}catch{el.innerHTML='';}
-}
-// override togReadLog for manual
-const _origTogReadLog=togReadLog;
-async function togReadLog(elId,type,id){
-  if(type==='manual')return togReadLog2(elId,id);
-  return _origTogReadLog(elId,type,id);
 }
 async function editManual(id){const mans=await sGet('cv_manuals',`?id=eq.${id}&select=*`);if(!mans.length)return;const m=mans[0];document.getElementById('man-id').value=id;document.getElementById('man-t').value=m.title;document.getElementById('man-cat').value=m.category;document.getElementById('man-v').value=m.version||'';document.getElementById('man-c').value=m.content;document.getElementById('man-mo-title').innerHTML='Edit Manual <button class="mc" onclick="cm(\'man-mo\')">✕</button>';om('man-mo');}
 async function delManual(id){if(!confirm('Delete?'))return;await sPatch('cv_manuals',`?id=eq.${id}`,{active:false});loadManuals();}
@@ -1795,7 +1788,6 @@ async function saveAnn(){const t=document.getElementById('ann-t').value.trim(),m
 async function loadAdmAnn(){const list=document.getElementById('adm-ann');if(!list)return;const anns=await sGet('cv_announcements','?active=eq.true&order=created_at.desc&select=*');list.innerHTML=anns.length?anns.map(a=>`<div style="display:flex;gap:8px;padding:8px 0;border-bottom:.5px solid var(--bd);align-items:flex-start;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;">${a.title}</div><div style="font-size:11px;color:var(--tx2);">${a.message.substring(0,80)}...</div></div><span class="b ${a.priority==='urgent'?'br':a.priority==='important'?'ba':'bb'}">${a.priority}</span><button class="abt" style="color:var(--er);" onclick="delAnn('${a.id}')">✕</button></div>`).join(''):'<div style="font-size:12px;color:var(--tx2);">No announcements.</div>';}
 async function delAnn(id){await sPatch('cv_announcements',`?id=eq.${id}`,{active:false});loadAdmAnn();}
 
-let schedRows=[];
 async function loadSchedEditor(){
   try{const cfg=await sGet('cv_config','?key=eq.schedule&select=value');schedRows=cfg.length?JSON.parse(cfg[0].value):[];}catch{schedRows=[];}renderSched();
 }
