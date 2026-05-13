@@ -338,6 +338,16 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
       <div class="sb-sub">
         <button class="sbl" onclick="sp('wo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Work Orders</button>
       </div>
+      <div class="sb-div"></div>
+      <div class="sb-cat" onclick="togCat(this)"><span class="sb-cat-label">👥 Crewing</span><span class="sb-cat-arrow">▾</span></div>
+      <div class="sb-sub">
+        <button class="sbl" onclick="sp('crewing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Crew Log</button>
+      </div>
+      <div class="sb-div"></div>
+      <div class="sb-cat" onclick="togCat(this)"><span class="sb-cat-label">👥 Crewing</span><span class="sb-cat-arrow">▾</span></div>
+      <div class="sb-sub">
+        <button class="sbl" onclick="sp('crewing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Crew Log</button>
+      </div>
       <div id="adm-sb-wrap" style="display:none;">
         <div class="sb-div"></div>
         <div class="sb-cat" onclick="togCat(this)"><span class="sb-cat-label">⚙️ Admin</span><span class="sb-cat-arrow">▾</span></div>
@@ -443,10 +453,18 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
 <!-- MUSTER -->
 <div id="pg-muster" class="pg">
   <div class="ph">
-    <div class="ph-l"><div class="bc">Home › HSSEQ › <span>Muster List</span></div><div class="pt">Muster List</div><div class="pst">EMERGENCY STATION BILL — Every crew member must memorize their station</div></div>
+    <div class="ph-l"><div class="bc">Home › HSSEQ › <span>Muster List</span></div><div class="pt">Muster List</div><div class="pst">EMERGENCY STATION BILL — Caspian Voyager</div></div>
     <div id="muster-edit-btn" style="display:none;"><button class="bs p" style="font-size:11px;padding:5px 10px;" onclick="om('muster-mo')">✏️ Edit</button></div>
   </div>
-  <div class="card"><h3>Crew Station Bill</h3><div id="muster-tbl-wrap"><div class="loading"><div class="spin"></div>Loading...</div></div></div>
+  <!-- PERSONAL CARD - shown first, prominent -->
+  <div id="muster-personal-card" style="margin-bottom:16px;"></div>
+  <!-- FULL LIST toggle -->
+  <div style="margin-bottom:10px;">
+    <button class="bs" onclick="togFullMuster()" id="muster-toggle-btn">📋 View Full Muster List ▾</button>
+  </div>
+  <div id="muster-full-wrap" style="display:none;">
+    <div class="card"><h3>Full Crew Station Bill</h3><div id="muster-tbl-wrap"><div class="loading"><div class="spin"></div>Loading...</div></div></div>
+  </div>
 </div>
 
 <!-- CHECKLISTS -->
@@ -581,6 +599,46 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   <div class="card"><h3>Equipment Register</h3><div id="lift-reg"><div class="loading"><div class="spin"></div>Loading...</div></div></div>
 </div>
 
+<!-- CREWING -->
+<div id="pg-crewing" class="pg">
+  <div class="ph">
+    <div class="ph-l"><div class="bc">Home › Crewing › <span>Crew Log</span></div><div class="pt">Daily Crew Log</div><div class="pst">42-day rotation system · Team A / Team B · Log who is onboard each day</div></div>
+    <button class="bs p" style="font-size:11px;padding:5px 10px;" onclick="om('crew-log-mo')">+ Log Today</button>
+  </div>
+  <!-- Today summary -->
+  <div id="crew-today-card" style="margin-bottom:14px;"></div>
+  <!-- History -->
+  <div class="card"><h3>Crew Log History</h3>
+    <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="date" id="crew-log-filter-date" style="padding:6px 9px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--bg);color:var(--tx);font-size:12px;outline:none;" onchange="loadCrewLog()"/>
+      <select id="crew-log-filter-team" style="padding:6px 9px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--bg);color:var(--tx);font-size:12px;outline:none;" onchange="loadCrewLog()">
+        <option value="">All Teams</option><option value="A">Team A</option><option value="B">Team B</option>
+      </select>
+      <button class="bs" onclick="document.getElementById('crew-log-filter-date').value='';loadCrewLog()">Clear</button>
+    </div>
+    <div id="crew-log-list"><div class="loading"><div class="spin"></div>Loading...</div></div>
+  </div>
+</div>
+
+<!-- CREWING -->
+<div id="pg-crewing" class="pg">
+  <div class="ph">
+    <div class="ph-l"><div class="bc">Home › Crewing › <span>Crew Log</span></div><div class="pt">Daily Crew Log</div><div class="pst">42-day rotation · Team A / Team B · Daily attendance tracking</div></div>
+    <button class="bs p" style="font-size:11px;padding:5px 10px;" onclick="om('crew-log-mo')">+ Log Today</button>
+  </div>
+  <div id="crew-today-card" style="margin-bottom:14px;"></div>
+  <div class="card"><h3>Crew Log History</h3>
+    <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="date" id="crew-log-date" style="padding:6px 9px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--bg);color:var(--tx);font-size:12px;outline:none;" onchange="loadCrewLog()"/>
+      <select id="crew-log-team" style="padding:6px 9px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--bg);color:var(--tx);font-size:12px;outline:none;" onchange="loadCrewLog()">
+        <option value="">All Teams</option><option value="A">Team A</option><option value="B">Team B</option>
+      </select>
+      <button class="bs" onclick="document.getElementById('crew-log-date').value='';loadCrewLog()">Show All</button>
+    </div>
+    <div id="crew-log-list"><div class="loading"><div class="spin"></div>Loading...</div></div>
+  </div>
+</div>
+
 <!-- WORK ORDERS -->
 <div id="pg-wo" class="pg">
   <div class="ph"><div class="ph-l"><div class="bc">Home › Maintenance › <span>Work Orders</span></div><div class="pt">Work Orders</div></div></div>
@@ -623,7 +681,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   <div class="ph"><div class="ph-l"><div class="bc">Home › <span>Admin</span></div><div class="pt">Admin Panel</div><div class="pst">Master / Chief Officer / Shore Staff</div></div></div>
   <div class="adm-tabs">
     <button class="adm-tab active" onclick="showAdmTab('adm-dash',this)">Dashboard</button>
-    <button class="adm-tab" onclick="showAdmTab('adm-users',this)">Users</button>
+    <button class="adm-tab" onclick="showAdmTab('adm-users',this)">Users & Access</button>
     <button class="adm-tab" onclick="showAdmTab('adm-sched',this)">Schedule</button>
     <button class="adm-tab" onclick="showAdmTab('adm-muster',this)">Muster</button>
     <button class="adm-tab" onclick="showAdmTab('adm-lifting',this)">Lifting</button>
@@ -632,6 +690,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
     <button class="adm-tab" onclick="showAdmTab('adm-reports',this)">Reports</button>
     <button class="adm-tab" onclick="showAdmTab('adm-queries',this)">Queries</button>
     <button class="adm-tab" onclick="showAdmTab('adm-pages',this)">Pages</button>
+    <button class="adm-tab" onclick="showAdmTab('adm-crew-logs',this)">Crew Logs</button>
   </div>
   <!-- ADMIN DASH -->
   <div class="adm-sec active" id="adm-dash">
@@ -639,7 +698,9 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
     <div class="asc"><h3>Vessel Config — HSSEQ KPIs</h3>
       <div class="fr">
         <div class="fg"><label>Crew Onboard</label><input id="cfg-crew" type="number" min="0" max="60"/></div>
-        <div class="fg"><label>LTI Free Days <span style="font-size:9px;color:var(--tx3);">(reset to 0 on LTI)</span></label><input id="cfg-lti" type="number" min="0"/></div>
+        <div class="fg"><label>LTI Start Date <span style="font-size:9px;color:var(--tx3);">(date of last LTI — auto-counts up from here)</span></label><input id="cfg-lti-date" type="date"/>
+        <div style="font-size:10px;color:var(--tx3);margin-top:3px;">System auto-calculates days since this date. When LTI occurs: set today's date. When injury incident is submitted, this resets automatically.</div>
+      </div>
         <div class="fg"><label>Near Misses (30d) <span style="font-size:9px;color:var(--tx3);">(each −2 pts)</span></label><input id="cfg-nm" type="number" min="0"/></div>
         <div class="fg"><label>Drills (90d) <span style="font-size:9px;color:var(--tx3);">(min 4 needed)</span></label><input id="cfg-dr" type="number" min="0"/></div>
       </div>
@@ -650,7 +711,10 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   </div>
   <!-- ADMIN USERS -->
   <div class="adm-sec" id="adm-users">
-    <div class="asc"><h3>Users & Password Reset</h3><div id="users-list"><div class="loading"><div class="spin"></div></div></div></div>
+    <div class="asc"><h3>Users, Access & Session Management</h3>
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:10px;">Set "Onboard Until" date to auto-suspend login when smend ends. Block/unblock manually. Delete removes account permanently.</div>
+      <div id="users-list"><div class="loading"><div class="spin"></div></div></div>
+    </div>
   </div>
   <!-- ADMIN SCHEDULE -->
   <div class="adm-sec" id="adm-sched">
@@ -698,6 +762,18 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   <div class="adm-sec" id="adm-queries">
     <div class="asc"><h3>All Anonymous Queries</h3><div id="adm-q-list"><div class="loading"><div class="spin"></div></div></div></div>
   </div>
+  <!-- ADMIN CREW LOGS -->
+  <div class="adm-sec" id="adm-crew-logs">
+    <div class="asc"><h3>Crew Log History (All Entries)</h3>
+      <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;">
+        <input type="date" id="adm-crew-date" style="padding:6px 9px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--bg);color:var(--tx);font-size:12px;outline:none;" onchange="loadAdmCrewLogs()"/>
+        <button class="bs" onclick="document.getElementById('adm-crew-date').value='';loadAdmCrewLogs()">All</button>
+        <button class="bs p" onclick="om('crew-log-mo')">+ Log Today</button>
+      </div>
+      <div id="adm-crew-log-list"><div class="loading"><div class="spin"></div></div></div>
+    </div>
+  </div>
+
   <!-- ADMIN PAGES -->
   <div class="adm-sec" id="adm-pages">
     <div class="asc"><h3>Custom Pages <button class="bs p" style="font-size:11px;padding:4px 9px;" onclick="om('page-mo')">+ New Page</button></h3>
@@ -921,7 +997,15 @@ async function doLogin(){
   try{
     const users=await sGet('cv_users',`?username=eq.${encodeURIComponent(u)}&select=*`);
     if(!users.length||users[0].password_hash!==btoa(p)){smsg('lmsg','Invalid credentials.','er');return;}
-    CU=users[0];
+    const usr=users[0];
+    // Check if blocked
+    if(usr.is_blocked){smsg('lmsg','Your account has been suspended. Contact admin. Reason: '+(usr.block_reason||'Account blocked'),'er');return;}
+    // Check if onboard_until expired
+    if(usr.onboard_until){
+      const today=new Date().toISOString().split('T')[0];
+      if(usr.onboard_until<today){smsg('lmsg','Your access has expired (smend bitmişdir: '+usr.onboard_until+'). Contact admin to reactivate.','er');return;}
+    }
+    CU=usr;
     localStorage.setItem('cv_session',JSON.stringify(CU));
     openApp();
   }catch(e){smsg('lmsg','Error: '+e.message,'er');}
@@ -961,7 +1045,7 @@ function sp(id,dynId){
   document.querySelectorAll('.sbl,.sbl-top').forEach(b=>b.classList.remove('active'));
   const sb=document.querySelector(`.sbl[onclick="sp('${id}')"],.sbl-top[onclick="sp('${id}')"]`);if(sb)sb.classList.add('active');
   document.getElementById('mc').scrollTop=0;
-  const loads={dash:loadDash,wo:loadWOs,permit:loadPTWs,report:loadReps,ll:loadLL,flash:loadFL,lifting:loadLifting,symbols:loadSymbols,manuals:loadManuals,admin:loadAdmin,hsseq:loadHSSEQ,lsr:loadLSR,policies:loadPolicies,induction:loadInduction,muster:loadMuster,checklist:loadChecklists};
+  const loads={dash:loadDash,wo:loadWOs,permit:loadPTWs,report:loadReps,ll:loadLL,flash:loadFL,lifting:loadLifting,symbols:loadSymbols,manuals:loadManuals,admin:loadAdmin,hsseq:loadHSSEQ,lsr:loadLSR,policies:loadPolicies,induction:loadInduction,muster:loadMuster,checklist:loadChecklists,crewing:loadCrewPage};
   if(loads[id])loads[id]();
   if(dynId)loadDynPage(dynId);
 }
@@ -981,7 +1065,9 @@ function showAdmTab(sec,btn){
     'adm-ptw':loadAdmPTW,
     'adm-reports':loadAdmRep,
     'adm-queries':loadAdmQ,
-    'adm-pages':loadAdmPages
+    'adm-pages':loadAdmPages,
+    'adm-crew-logs':loadAdmCrewLogs,
+    'adm-dash':loadAdmDash
   };
   if(loaders[sec])loaders[sec]();
 }
@@ -994,7 +1080,12 @@ async function loadDash(){
     const nm=parseInt(cfg.hsseq_near_misses||'0'),dr=parseInt(cfg.hsseq_drills||'0');
     const score=Math.min(100,Math.max(0,100-(nm*2)+Math.round(dr/4*10)));
     const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-    set('s-crew',cfg.crew_onboard||'—');set('s-lti',cfg.lti_free_days||'—');
+    set('s-crew',cfg.crew_onboard||'—');
+    // LTI: auto-calculate from start date
+    const ltiStart=cfg.lti_start_date;
+    let ltiDays=parseInt(cfg.lti_free_days||'0');
+    if(ltiStart){const d=Math.floor((new Date()-new Date(ltiStart))/86400000);ltiDays=d>=0?d:0;}
+    set('s-lti',ltiDays);
     set('s-hsseq',score+'%');document.getElementById('s-hsseq').style.color=score>=90?'var(--ok)':score>=75?'var(--wa)':'var(--er)';
     const [wos,ptws]=await Promise.all([sGet('cv_work_orders','?status=in.(open,in-progress)&select=id'),sGet('cv_permits','?status=eq.approved&select=id')]);
     set('s-wo',wos.length);set('s-ptw',ptws.length);
@@ -1016,7 +1107,8 @@ async function loadHSSEQ(){
   const cfg={};cfgs.forEach(c=>cfg[c.key]=c.value);
   const nm=parseInt(cfg.hsseq_near_misses||'0'),dr=parseInt(cfg.hsseq_drills||'0');
   const score=Math.min(100,Math.max(0,100-(nm*2)+Math.round(dr/4*10)));
-  document.getElementById('hsseq-stats').innerHTML=`<div class="sc"><div class="scl">Score</div><div class="scv">${score}%</div></div><div class="sc"><div class="scl">Near Misses</div><div class="scv">${nm}</div></div><div class="sc"><div class="scl">LTI Free</div><div class="scv">${cfg.lti_free_days||0}</div></div><div class="sc"><div class="scl">Drills</div><div class="scv">${dr}</div></div>`;
+  const ltiS=cfg.lti_start_date;let ltiD=parseInt(cfg.lti_free_days||'0');if(ltiS){const d=Math.floor((new Date()-new Date(ltiS))/86400000);ltiD=d>=0?d:0;}
+  document.getElementById('hsseq-stats').innerHTML=`<div class="sc"><div class="scl">Score</div><div class="scv">${score}%</div></div><div class="sc"><div class="scl">Near Misses</div><div class="scv">${nm}</div></div><div class="sc"><div class="scl">LTI Free Days</div><div class="scv">${ltiD}</div></div><div class="sc"><div class="scl">Drills</div><div class="scv">${dr}</div></div>`;
   document.getElementById('hsseq-cards').innerHTML=['induction:Induction:Supervised onboarding','lsr:Life Saving Rules:IOGP 9 critical rules','ll:Lesson Learned:Incidents & learnings','flash:Safety Flashes:Admin published alerts','muster:Muster List:Emergency station bill','symbols:Symbols:Safety signs library','lifting:Lifting Equipment:LOLER register','query:Anonymous Query:Confidential feedback','permit:Permit to Work:PTW + approval','policies:Policies:Vessel rules','checklist:Checklists:Operational checklists'].map(s=>{const[id,ttl,desc]=s.split(':');return`<div class="card" style="cursor:pointer;padding:13px;" onclick="sp('${id}')"><div style="font-size:12px;font-weight:600;margin-bottom:3px;">${ttl}</div><div style="font-size:11px;color:var(--tx2);">${desc}</div></div>`;}).join('');
 }
 
@@ -1223,7 +1315,7 @@ async function loadChecklists(){
         <div style="font-size:10px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;padding:5px 10px;background:var(--acb);border-radius:var(--r);">${cat}</div>
         ${items.map(t=>`<div class="rc" style="cursor:pointer;" onclick="startChecklist(${JSON.stringify(JSON.stringify(t))})">
           <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div><div class="rtl">${t.title}</div><div class="rmt">${t.description||''} · ${JSON.parse(t.items||'[]').length} questions</div></div>
+            <div><div class="rtl">${t.title}</div><div class="rmt">${t.description||''} · ${(Array.isArray(t.items)?t.items:(Array.isArray(t.items)?t.items:(typeof t.items==='string'?JSON.parse(t.items||'[]'):[]))).length} questions</div></div>
             <button class="bs p" style="font-size:11px;padding:5px 11px;">Start ▶</button>
           </div>
         </div>`).join('')}
@@ -1236,7 +1328,7 @@ function startChecklist(encoded){
   _clAnswers={};
   document.getElementById('cl-fill-title').textContent=_clTemplate.title;
   document.getElementById('cl-fill-cat').textContent=_clTemplate.category+' — '+(_clTemplate.description||'');
-  const items=typeof _clTemplate.items==='string'?JSON.parse(_clTemplate.items):_clTemplate.items;
+  const items=Array.isArray(_clTemplate.items)?_clTemplate.items:(typeof _clTemplate.items==='string'?JSON.parse(_clTemplate.items):[]);
   // group by group field
   const groups={};
   items.forEach(q=>{const g=q.group||'General';if(!groups[g])groups[g]=[];groups[g].push(q);});
@@ -1274,7 +1366,7 @@ async function submitChecklist(){
   const by=document.getElementById('cl-by').value.trim();
   if(!by){smsg('cl-submit-msg','Your name is required.','er');return;}
   if(!_clTemplate){smsg('cl-submit-msg','No checklist selected.','er');return;}
-  const items=typeof _clTemplate.items==='string'?JSON.parse(_clTemplate.items):_clTemplate.items;
+  const items=Array.isArray(_clTemplate.items)?_clTemplate.items:(typeof _clTemplate.items==='string'?JSON.parse(_clTemplate.items):[]);
   const answers=items.map(q=>({id:q.id,question:q.question,group:q.group||'General',answer:_clAnswers[q.id]||'not-answered',remark:document.getElementById('cl-rem-'+q.id)?.value||''}));
   const unanswered=answers.filter(a=>a.answer==='not-answered');
   if(unanswered.length>0){smsg('cl-submit-msg',`${unanswered.length} question(s) unanswered. Answer all questions before submitting.`,'er');return;}
@@ -1513,7 +1605,13 @@ async function submitRep(){
   smsg('rep-msg','Submitting...','ok');
   try{
     const id='INC-'+Date.now();
-    await sPost('cv_incidents',{id,incident_type:document.getElementById('rp-t').value,incident_datetime:document.getElementById('rp-d').value||null,location:document.getElementById('rp-l').value,reported_by:document.getElementById('rp-b').value||'Anonymous',description:d,immediate_actions:document.getElementById('rp-a').value,status:'under-review'});
+    const incType=document.getElementById('rp-t').value;
+    await sPost('cv_incidents',{id,incident_type:incType,incident_datetime:document.getElementById('rp-d').value||null,location:document.getElementById('rp-l').value,reported_by:document.getElementById('rp-b').value||'Anonymous',description:d,immediate_actions:document.getElementById('rp-a').value,status:'under-review'});
+    // Auto-reset LTI if injury type
+    if(incType==='Minor Injury'||incType==='Serious Injury'){
+      const today=new Date().toISOString().split('T')[0];
+      await sPatch('cv_config','?key=eq.lti_start_date',{value:today,updated_at:new Date().toISOString()});
+    }
     for(const f of pendingRep){const url=await uploadImg(f);await sPost('cv_incident_images',{incident_id:id,image_url:url,created_by:document.getElementById('rp-b').value||'Anonymous'});}
     pendingRep=[];document.getElementById('rep-img-prev').innerHTML='';
     smsg('rep-msg','Submitted: '+id,'ok');loadReps();
@@ -1778,7 +1876,9 @@ async function editPage(id){const pages=await sGet('cv_pages',`?id=eq.${id}&sele
 async function loadAdmin(){loadAdmDash();}
 async function loadAdmDash(){loadConfig();loadAdmAnn();}
 async function loadConfig(){
-  try{const cfgs=await sGet('cv_config','?select=key,value');const cfg={};cfgs.forEach(c=>cfg[c.key]=c.value);document.getElementById('cfg-crew').value=cfg.crew_onboard||'';document.getElementById('cfg-lti').value=cfg.lti_free_days||'';document.getElementById('cfg-nm').value=cfg.hsseq_near_misses||'';document.getElementById('cfg-dr').value=cfg.hsseq_drills||'';}catch(e){console.error(e);}
+  try{const cfgs=await sGet('cv_config','?select=key,value');const cfg={};cfgs.forEach(c=>cfg[c.key]=c.value);document.getElementById('cfg-crew').value=cfg.crew_onboard||'';
+    const ltiEl=document.getElementById('cfg-lti-date');if(ltiEl)ltiEl.value=cfg.lti_start_date||'';
+    document.getElementById('cfg-nm').value=cfg.hsseq_near_misses||'';document.getElementById('cfg-dr').value=cfg.hsseq_drills||'';}catch(e){console.error(e);}
 }
 async function saveConfig(){
   try{const updates=[{key:'crew_onboard',value:document.getElementById('cfg-crew').value},{key:'lti_free_days',value:document.getElementById('cfg-lti').value},{key:'hsseq_near_misses',value:document.getElementById('cfg-nm').value},{key:'hsseq_drills',value:document.getElementById('cfg-dr').value}];for(const u of updates)await sPatch('cv_config',`?key=eq.${u.key}`,{value:u.value,updated_at:new Date().toISOString()});smsg('cfg-msg','Saved.','ok');}
@@ -1795,7 +1895,13 @@ function renderSched(){const el=document.getElementById('sched-ed');if(!el)retur
 function addSchedRow(){schedRows.push({time:'08:00',task:''});renderSched();}
 async function saveSched(){try{await sPatch('cv_config','?key=eq.schedule',{value:JSON.stringify(schedRows),updated_at:new Date().toISOString()});smsg('sched-msg','Saved.','ok');}catch(e){smsg('sched-msg','Error: '+e.message,'er');}}
 
-async function loadAdmUsers(){const list=document.getElementById('users-list');if(!list)return;try{const users=await sGet('cv_users','?order=created_at.asc&select=*');list.innerHTML=users.length?`<table class="dt"><thead><tr><th>Username</th><th>Name</th><th>Rank</th><th>Admin</th><th>Joined</th><th>Action</th></tr></thead><tbody>`+users.map(u=>`<tr><td style="font-family:var(--m);font-size:11px;">${u.username}</td><td>${u.full_name}</td><td>${u.rank}</td><td>${u.is_admin?'<span class="b bb">Yes</span>':'—'}</td><td style="font-size:10px;color:var(--tx3);">${new Date(u.created_at).toLocaleDateString()}</td><td><button class="abt" onclick="resetPW('${u.id}','${u.username}')">Reset PW</button></td></tr>`).join('')+'</tbody></table>':'<div style="font-size:12px;color:var(--tx2);">No users.</div>';}catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error.</div>';}}
+async function loadAdmUsers(){const list=document.getElementById('users-list');if(!list)return;try{const users=await sGet('cv_users','?order=created_at.asc&select=*');const today=new Date().toISOString().split('T')[0];
+    list.innerHTML=users.length?`<table class="dt"><thead><tr><th>Username</th><th>Name</th><th>Rank</th><th>Status</th><th>Until</th><th>Actions</th></tr></thead><tbody>`+users.map(u=>{
+      const blocked=u.is_blocked;
+      const expired=u.onboard_until&&u.onboard_until<today;
+      const statusBadge=blocked?'<span class="b br">Blocked</span>':expired?'<span class="b ba">Expired</span>':'<span class="b bg">Active</span>';
+      return`<tr style="${blocked||expired?'opacity:.65':''}"><td style="font-family:var(--m);font-size:11px;">${u.username}</td><td>${u.full_name}</td><td>${u.rank}</td><td>${statusBadge}</td><td style="font-size:10px;color:var(--tx3);">${u.onboard_until||'—'}</td><td style="display:flex;gap:4px;flex-wrap:wrap;"><button class="abt" onclick="resetPW('${u.id}','${u.username}')">PW</button><button class="abt" onclick="openUserMgmt(${JSON.stringify(JSON.stringify(u))})">Manage</button></td></tr>`;
+    }).join('')+'</tbody></table>':'<div style="font-size:12px;color:var(--tx2);">No users.</div>';}catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error.</div>';}}
 async function resetPW(uid,uname){const pw=prompt(`New password for ${uname} (min 6):`);if(!pw||pw.length<6){alert('Too short.');return;}await sPatch('cv_users',`?id=eq.${uid}`,{password_hash:btoa(pw)});alert('Reset for '+uname);}
 
 async function loadAdmChecklists(){
@@ -1813,14 +1919,283 @@ async function loadAdmRep(){const list=document.getElementById('adm-rep-list');i
 async function loadAdmQ(){const list=document.getElementById('adm-q-list');if(!list)return;const qs=await sGet('cv_queries','?order=created_at.desc&select=*');list.innerHTML=qs.length?qs.map(q=>`<div style="padding:7px 0;border-bottom:.5px solid var(--bd);"><div style="display:flex;gap:5px;align-items:center;margin-bottom:4px;"><span class="b bb">${q.topic}</span><span class="b ba">${q.urgency}</span><select class="sst" onchange="chQ('${q.id}',this.value)"><option value="new" ${q.status==='new'?'selected':''}>New</option><option value="reviewed" ${q.status==='reviewed'?'selected':''}>Reviewed</option><option value="actioned" ${q.status==='actioned'?'selected':''}>Actioned</option></select><span style="font-size:10px;color:var(--tx3);margin-left:auto;">${new Date(q.created_at).toLocaleString()}</span></div><div style="font-size:12px;">${q.message}</div></div>`).join(''):'<div style="font-size:12px;color:var(--tx2);">None.</div>';}
 async function chQ(id,s){await sPatch('cv_queries',`?id=eq.${id}`,{status:s});}
 async function loadAdmPages(){const list=document.getElementById('adm-pages-list');if(!list)return;const pages=await sGet('cv_pages','?order=sort_order.asc,title.asc&select=*');list.innerHTML=pages.length?pages.map(p=>`<div style="display:flex;gap:8px;padding:8px 0;border-bottom:.5px solid var(--bd);align-items:center;"><span style="font-size:16px;">${p.icon||'📄'}</span><span style="flex:1;font-size:12px;font-weight:500;">${p.title}</span><span class="b bgr">${p.category||'—'}</span><button class="abt" onclick="editPage('${p.id}')">Edit</button><button class="abt" style="color:var(--er);" onclick="delPage('${p.id}')">Del</button></div>`).join(''):'<div style="font-size:12px;color:var(--tx2);">No custom pages.</div>';}
+async function loadAdmCrewLogs(){
+  const list=document.getElementById('adm-crew-log-list');if(!list)return;
+  list.innerHTML='<div class="loading"><div class="spin"></div>Loading...</div>';
+  try{
+    let q='?order=log_date.desc,created_at.desc&select=*&limit=90';
+    const d=document.getElementById('adm-crew-date')?.value;
+    if(d)q=`?log_date=eq.${d}&order=created_at.desc&select=*`;
+    const logs=await sGet('cv_crew_log',q);
+    if(!logs.length){list.innerHTML='<div style="font-size:12px;color:var(--tx2);">No crew logs yet.</div>';return;}
+    const byDate={};
+    logs.forEach(l=>{if(!byDate[l.log_date])byDate[l.log_date]=[];byDate[l.log_date].push(l);});
+    list.innerHTML=Object.entries(byDate).map(([date,entries])=>`
+      <div style="margin-bottom:11px;">
+        <div style="font-size:10px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;padding:4px 9px;background:var(--acb);border-radius:var(--r);">${date} — Team ${entries[0].team||'A'} · Logged by: ${entries[0].logged_by||'—'}</div>
+        <div style="background:var(--bg2);border:.5px solid var(--bd);border-radius:var(--r);padding:10px 13px;">
+          <div style="font-size:12px;white-space:pre-line;line-height:1.8;">${entries[0].crew_member}</div>
+          ${entries[0].notes?`<div style="font-size:11px;color:var(--tx2);margin-top:6px;padding-top:6px;border-top:.5px solid var(--bd);">Notes: ${entries[0].notes}</div>`:''}
+        </div>
+      </div>`).join('');
+  }catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
+}
+
 async function delPage(id){if(!confirm('Delete page?'))return;await sPatch('cv_pages',`?id=eq.${id}`,{active:false});loadAdmPages();loadDynPages();}
+
+// ===== MUSTER PERSONAL VIEW =====
+async function loadMuster(){
+  const el=document.getElementById('muster-personal-card');
+  const tblWrap=document.getElementById('muster-tbl-wrap');
+  if(!el)return;
+  el.innerHTML='<div class="loading"><div class="spin"></div>Loading...</div>';
+  try{
+    // Get personal assignment from cv_muster_assignments by rank
+    const rank=CU.rank;
+    let assignment=null;
+    const rows=await sGet('cv_muster_assignments',`?rank=eq.${encodeURIComponent(rank)}&select=*`);
+    if(rows.length)assignment=rows[0];
+
+    if(assignment){
+      el.innerHTML=`
+        <div style="background:linear-gradient(135deg,#003d99,#0066cc);border-radius:var(--rl);padding:20px 24px;color:#fff;margin-bottom:8px;">
+          <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">YOUR EMERGENCY STATION — CASPIAN VOYAGER</div>
+          <div style="font-size:22px;font-weight:700;margin-bottom:16px;">${rank}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;">
+              <div style="font-size:10px;opacity:.7;margin-bottom:3px;">MUSTER STATION</div>
+              <div style="font-size:14px;font-weight:600;">${assignment.muster_station||'—'}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;">
+              <div style="font-size:10px;opacity:.7;margin-bottom:3px;">LIFEBOAT</div>
+              <div style="font-size:14px;font-weight:600;">${assignment.lifeboat||'—'}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;">
+              <div style="font-size:10px;opacity:.7;margin-bottom:3px;">FIRE / EXPLOSION DUTY</div>
+              <div style="font-size:13px;font-weight:500;">${assignment.fire_role||'—'}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;">
+              <div style="font-size:10px;opacity:.7;margin-bottom:3px;">LIFEBOAT DUTY</div>
+              <div style="font-size:13px;font-weight:500;">${assignment.lifeboat_role||'—'}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;">
+              <div style="font-size:10px;opacity:.7;margin-bottom:3px;">OIL POLLUTION ROLE</div>
+              <div style="font-size:13px;font-weight:500;">${assignment.oil_pollution_role||'—'}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;">
+              <div style="font-size:10px;opacity:.7;margin-bottom:3px;">MOB / RESCUE BOAT</div>
+              <div style="font-size:13px;font-weight:500;">${assignment.mob_rescue_role||'—'}</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:10px 13px;background:rgba(255,255,255,.1);border-radius:var(--r);">
+            <div style="font-size:10px;opacity:.7;margin-bottom:3px;">DAMAGE CONTROL</div>
+            <div style="font-size:12px;">${assignment.damage_control||'—'}</div>
+          </div>
+          <div style="margin-top:8px;padding:10px 13px;background:rgba(255,255,255,.1);border-radius:var(--r);">
+            <div style="font-size:10px;opacity:.7;margin-bottom:3px;">EMERGENCY STEERING</div>
+            <div style="font-size:12px;">${assignment.emergency_steering||'—'}</div>
+          </div>
+          <div style="margin-top:14px;font-size:10px;opacity:.6;text-align:center;">⚠ Memorize your station. Post is at ${assignment.muster_station} at all times during emergency.</div>
+        </div>`;
+    } else {
+      // Try matching by partial rank (AB Seaman 1,2,3,4 all match AB Seaman)
+      const baseRank=rank.replace(/ \d+$/,'').replace(/ [A-Z]$/,'');
+      const rows2=await sGet('cv_muster_assignments',`?rank=ilike.${encodeURIComponent(baseRank+'%')}&select=*&limit=1`);
+      if(rows2.length){
+        const a=rows2[0];
+        el.innerHTML=`<div style="background:linear-gradient(135deg,#003d99,#0066cc);border-radius:var(--rl);padding:20px 24px;color:#fff;">
+          <div style="font-size:11px;opacity:.7;margin-bottom:4px;">YOUR EMERGENCY STATION</div>
+          <div style="font-size:20px;font-weight:700;margin-bottom:12px;">${rank}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:9px 12px;"><div style="font-size:10px;opacity:.7;">MUSTER STATION</div><div style="font-size:13px;font-weight:600;">${a.muster_station}</div></div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:9px 12px;"><div style="font-size:10px;opacity:.7;">LIFEBOAT</div><div style="font-size:13px;font-weight:600;">${a.lifeboat}</div></div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:9px 12px;"><div style="font-size:10px;opacity:.7;">FIRE DUTY</div><div style="font-size:12px;">${a.fire_role}</div></div>
+            <div style="background:rgba(255,255,255,.12);border-radius:var(--r);padding:9px 12px;"><div style="font-size:10px;opacity:.7;">LIFEBOAT DUTY</div><div style="font-size:12px;">${a.lifeboat_role}</div></div>
+          </div>
+        </div>`;
+      } else {
+        el.innerHTML=`<div style="background:var(--wab);border:.5px solid var(--wad);border-radius:var(--r);padding:14px;"><div style="font-size:13px;font-weight:600;color:var(--wa);margin-bottom:5px;">⚠ No muster assignment found for your rank</div><div style="font-size:12px;color:var(--tx2);">Contact Master or Chief Officer to be assigned to your emergency station.</div></div>`;
+      }
+    }
+    // Load full muster table in background
+    loadFullMusterTable();
+  }catch(e){el.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
+}
+
+function togFullMuster(){
+  const wrap=document.getElementById('muster-full-wrap');
+  const btn=document.getElementById('muster-toggle-btn');
+  if(!wrap)return;
+  if(wrap.style.display==='none'){
+    wrap.style.display='block';
+    if(btn)btn.textContent='📋 Hide Full Muster List ▴';
+  } else {
+    wrap.style.display='none';
+    if(btn)btn.textContent='📋 View Full Muster List ▾';
+  }
+}
+
+async function loadFullMusterTable(){
+  const el=document.getElementById('muster-tbl-wrap');if(!el)return;
+  try{
+    const rows=await sGet('cv_muster','?active=eq.true&order=sort_order.asc&select=*');
+    if(!rows.length){el.innerHTML='<div style="font-size:12px;color:var(--tx2);">No muster data.</div>';return;}
+    el.innerHTML=`<table class="dt"><thead><tr><th>#</th><th>Rank</th><th>Station</th><th>Lifeboat</th><th>Fire Role</th><th>Dept</th></tr></thead><tbody>`+
+      rows.map(r=>`<tr ${r.rank===CU.rank?'style="background:var(--acb);"':''}><td style="font-family:var(--m);font-size:11px;">${r.sl_no}</td><td>${r.rank}${r.rank===CU.rank?' ←':''}</td><td>${r.muster_station}</td><td>${r.lifeboat}</td><td>${r.fire_role}</td><td><span class="b ${r.department==='DECK'?'bb':r.department==='ENGINE'?'ba':'bgr'}">${r.department}</span></td></tr>`).join('')+
+      '</tbody></table>';
+  }catch(e){el.innerHTML='<div style="color:var(--er);font-size:12px;">Error.</div>';}
+}
+
+// ===== CREWING / CREW LOG =====
+async function loadCrewPage(){
+  // show today's log
+  const today=new Date().toISOString().split('T')[0];
+  const card=document.getElementById('crew-today-card');
+  if(card){
+    try{
+      const logs=await sGet('cv_crew_log',`?log_date=eq.${today}&order=created_at.desc&select=*`);
+      if(logs.length){
+        const latest=logs[0];
+        card.innerHTML=`<div style="background:var(--okb);border:.5px solid var(--okd);border-radius:var(--rl);padding:14px 17px;">
+          <div style="font-size:11px;font-weight:600;color:var(--ok);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Today's Log — ${today} · Team ${latest.team||'A'}</div>
+          <div style="font-size:12px;white-space:pre-line;">${latest.crew_member}</div>
+          ${latest.notes?`<div style="font-size:11px;color:var(--tx2);margin-top:7px;padding-top:7px;border-top:.5px solid var(--okd);">Notes: ${latest.notes}</div>`:''}
+          <div style="font-size:10px;color:var(--tx3);margin-top:5px;font-family:var(--m);">Logged by: ${latest.logged_by||'—'}</div>
+        </div>`;
+      } else {
+        card.innerHTML=`<div style="background:var(--wab);border:.5px solid var(--wad);border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--wa);">⚠ No crew log for today (${today}). Use "+ Log Today" to record who is onboard.</div>`;
+      }
+    }catch(e){card.innerHTML='';}
+  }
+  // pre-fill today's date
+  const dateEl=document.getElementById('crew-log-date');
+  if(dateEl&&!dateEl.value)dateEl.value=today;
+  loadCrewLog();
+  // also pre-fill modal date
+  const clDate=document.getElementById('cl-date');
+  if(clDate)clDate.value=today;
+}
+
+async function loadCrewLog(){
+  const list=document.getElementById('crew-log-list');if(!list)return;
+  list.innerHTML='<div class="loading"><div class="spin"></div>Loading...</div>';
+  try{
+    let q='?order=log_date.desc,created_at.desc&select=*&limit=60';
+    const d=document.getElementById('crew-log-date')?.value;
+    const t=document.getElementById('crew-log-team')?.value;
+    if(d)q=`?log_date=eq.${d}&order=created_at.desc&select=*`;
+    else if(t)q=`?team=eq.${t}&order=log_date.desc&select=*&limit=60`;
+
+    const logs=await sGet('cv_crew_log',q);
+    if(!logs.length){list.innerHTML='<div style="font-size:12px;color:var(--tx2);">No log entries yet.</div>';return;}
+
+    // Group by date
+    const byDate={};
+    logs.forEach(l=>{if(!byDate[l.log_date])byDate[l.log_date]=[];byDate[l.log_date].push(l);});
+
+    list.innerHTML=Object.entries(byDate).map(([date,entries])=>`
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;padding:5px 10px;background:var(--acb);border-radius:var(--r);">${date} — Team ${entries[0].team||'A'}</div>
+        <div style="background:var(--bg2);border:.5px solid var(--bd);border-radius:var(--r);padding:11px 14px;">
+          <div style="font-size:12px;white-space:pre-line;line-height:1.8;">${entries[0].crew_member}</div>
+          ${entries[0].notes?`<div style="font-size:11px;color:var(--tx2);margin-top:7px;padding-top:7px;border-top:.5px solid var(--bd);">Notes: ${entries[0].notes}</div>`:''}
+          <div style="font-size:10px;color:var(--tx3);margin-top:5px;font-family:var(--m);">By: ${entries[0].logged_by||'—'} · ${new Date(entries[0].created_at).toLocaleString()}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
+}
+
+async function saveCrewLog(){
+  const members=document.getElementById('cl-members').value.trim();
+  const date=document.getElementById('cl-date').value;
+  if(!members||!date){smsg('cl-msg','Date and crew list required.','er');return;}
+  try{
+    await sPost('cv_crew_log',{log_date:date,crew_member:members,team:document.getElementById('cl-team').value,notes:document.getElementById('cl-notes').value,logged_by:CU.full_name,status:'onboard'});
+    smsg('cl-msg','Crew log saved.','ok');
+    setTimeout(()=>{cm('crew-log-mo');loadCrewPage();},1500);
+  }catch(e){smsg('cl-msg','Error: '+e.message,'er');}
+}
+
+// ===== USER MANAGEMENT =====
+function openUserMgmt(encoded){
+  const u=JSON.parse(JSON.parse(encoded));
+  document.getElementById('mgmt-uid').value=u.id;
+  document.getElementById('user-mgmt-title').innerHTML=`Manage: ${u.full_name} <button class="mc" onclick="cm('user-mgmt-mo')">✕</button>`;
+  document.getElementById('mgmt-user-info').innerHTML=`<div style="font-size:12px;"><b>${u.full_name}</b> · ${u.rank}<br/>Username: ${u.username} · Admin: ${u.is_admin?'Yes':'No'}<br/>Status: ${u.is_blocked?'<span style="color:var(--er);">BLOCKED</span>':'<span style="color:var(--ok);">Active</span>'} · Until: ${u.onboard_until||'No limit set'}</div>`;
+  document.getElementById('mgmt-onboard-until').value=u.onboard_until||'';
+  document.getElementById('mgmt-block-reason').value=u.block_reason||'';
+  cm('user-mgmt-mo');
+  setTimeout(()=>om('user-mgmt-mo'),10);
+}
+
+async function saveUserMgmt(action){
+  const uid=document.getElementById('mgmt-uid').value;
+  const until=document.getElementById('mgmt-onboard-until').value;
+  const reason=document.getElementById('mgmt-block-reason').value;
+  try{
+    if(action==='extend'){
+      await sPatch('cv_users',`?id=eq.${uid}`,{onboard_until:until||null});
+      smsg('mgmt-msg','Saved. Login will be suspended after '+until,'ok');
+    } else if(action==='block'){
+      await sPatch('cv_users',`?id=eq.${uid}`,{is_blocked:true,block_reason:reason||'Blocked by admin',onboard_until:until||null});
+      smsg('mgmt-msg','User blocked.','ok');
+    } else if(action==='unblock'){
+      await sPatch('cv_users',`?id=eq.${uid}`,{is_blocked:false,block_reason:null});
+      smsg('mgmt-msg','User unblocked.','ok');
+    } else if(action==='delete'){
+      if(!confirm('Delete this user permanently?'))return;
+      await sDel('cv_users',`?id=eq.${uid}`);
+      cm('user-mgmt-mo');alert('User deleted.');
+    }
+    setTimeout(loadAdmUsers,1500);
+  }catch(e){smsg('mgmt-msg','Error: '+e.message,'er');}
+}
 
 // ===== AUTO LOGIN =====
 window.addEventListener('load',()=>{
   const s=localStorage.getItem('cv_session');
-  if(s){try{CU=JSON.parse(s);openApp();}catch{}}
+  if(s){try{
+    const cached=JSON.parse(s);
+    // Re-validate from DB to check if blocked/expired
+    const fresh=await sGet('cv_users',`?id=eq.${cached.id}&select=*`);
+    if(fresh.length){
+      const usr=fresh[0];
+      if(usr.is_blocked){localStorage.removeItem('cv_session');return;}
+      if(usr.onboard_until){const today=new Date().toISOString().split('T')[0];if(usr.onboard_until<today){localStorage.removeItem('cv_session');return;}}
+      CU=usr;openApp();
+    }
+  }catch{CU=JSON.parse(localStorage.getItem('cv_session')||'null');if(CU)openApp();}}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('ls').style.display!=='none'&&document.getElementById('fl').className==='fa')doLogin();});
 </script>
+<!-- CREW LOG MODAL -->
+<div class="mo" id="crew-log-mo"><div class="md">
+  <h3>Log Today's Crew <button class="mc" onclick="cm('crew-log-mo')">✕</button></h3>
+  <div style="background:var(--acb);border:.5px solid var(--ac);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--act);">Log who is physically onboard today. This creates a daily attendance record.</div>
+  <div class="fr"><div class="fg"><label>Log Date</label><input id="cl-date" type="date"/></div><div class="fg"><label>Team</label><select id="cl-team"><option value="A">Team A (Current)</option><option value="B">Team B</option></select></div></div>
+  <div class="fr full"><div class="fg"><label>Crew Members Onboard (one per line: Name — Rank)</label><textarea id="cl-members" style="min-height:180px;" placeholder="Ahmadiyya Hajiyev — Chief Officer&#10;Anar Mustafayev — Chief Engineer&#10;..."></textarea></div></div>
+  <div class="fr full"><div class="fg"><label>Notes</label><input id="cl-notes" type="text" placeholder="Any notes about crew changes, sign-ons, sign-offs..."/></div></div>
+  <div id="cl-msg" class="fm"></div>
+  <div class="brow"><button class="bs p" onclick="saveCrewLog()">Save Log</button><button class="bs" onclick="cm('crew-log-mo')">Cancel</button></div>
+</div></div>
+
+<!-- USER MANAGEMENT MODAL -->
+<div class="mo" id="user-mgmt-mo"><div class="md">
+  <h3 id="user-mgmt-title">Manage User <button class="mc" onclick="cm('user-mgmt-mo')">✕</button></h3>
+  <input type="hidden" id="mgmt-uid"/>
+  <div id="mgmt-user-info" style="background:var(--bg3);border-radius:var(--r);padding:10px 12px;margin-bottom:14px;font-size:12px;"></div>
+  <div class="fr"><div class="fg"><label>Onboard Until (smend bitmə tarixi)</label><input id="mgmt-onboard-until" type="date"/>
+    <div style="font-size:10px;color:var(--tx3);margin-top:3px;">After this date, user login will be automatically suspended until manually reactivated.</div>
+  </div><div class="fg"><label>Block Reason (if blocking)</label><input id="mgmt-block-reason" type="text" placeholder="Smend bitdi, şikayət, etc."/></div></div>
+  <div id="mgmt-msg" class="fm"></div>
+  <div class="brow">
+    <button class="bs p" onclick="saveUserMgmt('extend')">💾 Save Dates</button>
+    <button class="bs" style="background:var(--wab);border-color:var(--wad);color:var(--wa);" onclick="saveUserMgmt('block')">🚫 Block User</button>
+    <button class="bs bg" onclick="saveUserMgmt('unblock')" style="background:var(--okb);border-color:var(--okd);color:var(--ok);">✓ Unblock</button>
+    <button class="bs d" onclick="saveUserMgmt('delete')">🗑 Delete User</button>
+    <button class="bs" onclick="cm('user-mgmt-mo')">Cancel</button>
+  </div>
+</div></div>
+
 </body>
 </html>
