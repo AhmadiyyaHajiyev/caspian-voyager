@@ -341,11 +341,6 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
       <div class="sb-div"></div>
       <div class="sb-cat" onclick="togCat(this)"><span class="sb-cat-label">👥 Crewing</span><span class="sb-cat-arrow">▾</span></div>
       <div class="sb-sub">
-        <button class="sbl" onclick="sp('crewing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Crew Log</button>
-      </div>
-      <div class="sb-div"></div>
-      <div class="sb-cat" onclick="togCat(this)"><span class="sb-cat-label">👥 Crewing</span><span class="sb-cat-arrow">▾</span></div>
-      <div class="sb-sub">
         <button class="sbl" onclick="sp('crewing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Crew Log</button>
       </div>
       <div id="adm-sb-wrap" style="display:none;">
@@ -515,24 +510,45 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
 <!-- INCIDENT REPORT -->
 <div id="pg-report" class="pg">
   <div class="ph"><div class="ph-l"><div class="bc">Home › HSSEQ › <span>Incident Report</span></div><div class="pt">Incident Reporting</div></div></div>
-  <div class="card"><h3>Submit Report</h3>
+  <div class="card"><h3>Create New Report</h3>
     <div id="rep-msg" class="fm"></div>
-    <div class="fr"><div class="fg"><label>Type</label><select id="rp-t"><option>Near Miss</option><option>Minor Injury</option><option>Serious Injury</option><option>Property Damage</option><option>Environmental</option><option>Unsafe Act/Condition</option></select></div><div class="fg"><label>Date & Time</label><input id="rp-d" type="datetime-local"/></div></div>
-    <div class="fr"><div class="fg"><label>Location</label><input id="rp-l" type="text"/></div><div class="fg"><label>Reported By</label><input id="rp-b" type="text" placeholder="Name or Anonymous"/></div></div>
-    <div class="fr full"><div class="fg"><label>What Happened</label><textarea id="rp-w"></textarea></div></div>
-    <div class="fr full"><div class="fg"><label>Immediate Actions</label><textarea id="rp-a"></textarea></div></div>
-    <div class="fg"><label>Attach Images</label>
+    <div class="fr"><div class="fg"><label>Incident Type</label>
+      <select id="rp-t" onchange="updateIncFlowInfo()">
+        <option>Near Miss</option><option>Minor Injury</option><option>Serious Injury</option>
+        <option>Property Damage</option><option>Environmental</option>
+        <option>Unsafe Act/Condition</option><option>Observation</option>
+      </select></div>
+      <div class="fg"><label>Date &amp; Time</label><input id="rp-d" type="datetime-local"/></div></div>
+    <div class="fr"><div class="fg"><label>Location</label><input id="rp-l" type="text"/></div>
+      <div class="fg"><label>Reported By</label><input id="rp-b" type="text" placeholder="Your full name..."/></div></div>
+    <div id="rp-flow-info" style="margin:8px 0;padding:8px 11px;background:var(--acb);border:.5px solid var(--ac);border-radius:var(--r);font-size:11px;color:var(--act);">
+      📋 <b>Near Miss/Injury/Property/Environmental:</b> Created → Reported → Reviewed → Investigated → CAPA Verified → Closed (Shore Staff only)<br/>
+      📋 <b>Observation/Unsafe Act:</b> Created → Reviewed → Closed
+    </div>
+    <div class="fr"><div class="fg"><label>Severity</label><select id="rp-sev"><option value="">Select...</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+      <div class="fg"><label>Department</label><select id="rp-dept"><option>Deck</option><option>Engine</option><option>Bridge</option><option>Catering</option><option>All</option></select></div></div>
+    <div class="fr full"><div class="fg"><label>What Happened</label><textarea id="rp-w" placeholder="Describe in detail..."></textarea></div></div>
+    <div class="fr full"><div class="fg"><label>Immediate Actions Taken</label><textarea id="rp-a"></textarea></div></div>
+    <div class="fg"><label>Attach Evidence</label>
       <div class="iua" onclick="document.getElementById('rep-img-inp').click()">
         <input type="file" id="rep-img-inp" accept="image/*" multiple onchange="prevImgs(this,'rep-img-prev','rep')"/>
         <div style="font-size:12px;color:var(--tx2);">📎 Click to attach images</div>
       </div>
       <div class="ig2" id="rep-img-prev"></div>
     </div>
-    <div class="brow"><button class="bs p" onclick="submitRep()">Submit Report</button></div>
+    <div class="brow"><button class="bs p" onclick="submitRep()">Create Report</button></div>
   </div>
-  <div style="margin-top:13px;"><div style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Submitted Reports</div><div id="rep-list"><div class="loading"><div class="spin"></div></div></div></div>
+  <div style="margin-top:13px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;">Submitted Reports</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <select id="rep-f-status" class="sst" onchange="loadReps()"><option value="">All Status</option><option value="created">Created</option><option value="reported">Reported</option><option value="reviewed">Reviewed</option><option value="investigated">Investigated</option><option value="capa_verified">CAPA Verified</option><option value="closed">Closed</option></select>
+        <select id="rep-f-type" class="sst" onchange="loadReps()"><option value="">All Types</option><option value="Near Miss">Near Miss</option><option value="Minor Injury">Minor Injury</option><option value="Observation">Observation</option></select>
+      </div>
+    </div>
+    <div id="rep-list"><div class="loading"><div class="spin"></div></div></div>
+  </div>
 </div>
-
 <!-- QUERY -->
 <div id="pg-query" class="pg">
   <div class="ph"><div class="ph-l"><div class="bc">Home › HSSEQ › <span>Anonymous Query</span></div><div class="pt">Anonymous Query</div></div></div>
@@ -684,6 +700,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
     <button class="adm-tab" onclick="showAdmTab('adm-users',this)">Users & Access</button>
     <button class="adm-tab" onclick="showAdmTab('adm-sched',this)">Schedule</button>
     <button class="adm-tab" onclick="showAdmTab('adm-muster',this)">Muster</button>
+    <button class="adm-tab" onclick="showAdmTab('adm-muster-assign',this)">Muster Assign</button>
     <button class="adm-tab" onclick="showAdmTab('adm-lifting',this)">Lifting</button>
     <button class="adm-tab" onclick="showAdmTab('adm-checklists',this)">Checklists</button>
     <button class="adm-tab" onclick="showAdmTab('adm-ptw',this)">Permits</button>
@@ -762,6 +779,15 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px;li
   <div class="adm-sec" id="adm-queries">
     <div class="asc"><h3>All Anonymous Queries</h3><div id="adm-q-list"><div class="loading"><div class="spin"></div></div></div></div>
   </div>
+  <!-- ADMIN MUSTER ASSIGNMENTS -->
+  <div class="adm-sec" id="adm-muster-assign">
+    <div class="asc">
+      <h3>Muster Assignments by Rank <button class="bs p" style="font-size:11px;padding:4px 9px;" onclick="newMusterAssign()">+ Add Rank</button></h3>
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:10px;">Each rank's personal emergency station card is defined here. Crew see their own card when they open Muster List.</div>
+      <div id="adm-mra-list"><div class="loading"><div class="spin"></div></div></div>
+    </div>
+  </div>
+
   <!-- ADMIN CREW LOGS -->
   <div class="adm-sec" id="adm-crew-logs">
     <div class="asc"><h3>Crew Log History (All Entries)</h3>
@@ -941,7 +967,7 @@ async function uploadImg(file){
 }
 
 // ===== STATE =====
-let CU=null,dark=localStorage.getItem('cv_dark')==='1';
+let CU=null,dark=localStorage.getItem('cv_dark')==='1',_allTemplates={},_allUsers={};
 let _wf='all',schedRows=[],pendingWO=[],pendingRep=[];
 let _lsrData=[],_polData=[],_indData=[],_indAnswers={},_musterData=[];
 let _clTemplate=null,_clAnswers={};
@@ -1067,6 +1093,7 @@ function showAdmTab(sec,btn){
     'adm-queries':loadAdmQ,
     'adm-pages':loadAdmPages,
     'adm-crew-logs':loadAdmCrewLogs,
+    'adm-muster-assign':loadAdmMusterAssign,
     'adm-dash':loadAdmDash
   };
   if(loaders[sec])loaders[sec]();
@@ -1090,7 +1117,7 @@ async function loadDash(){
     const [wos,ptws]=await Promise.all([sGet('cv_work_orders','?status=in.(open,in-progress)&select=id'),sGet('cv_permits','?status=eq.approved&select=id')]);
     set('s-wo',wos.length);set('s-ptw',ptws.length);
     const ki=document.getElementById('kpi-grid');
-    if(ki)ki.innerHTML=`<div class="sc"><div class="scl">Near Misses 30d</div><div class="scv">${nm}</div><div class="scd">−${nm*2} pts</div></div><div class="sc"><div class="scl">Drills 90d</div><div class="scv">${dr}</div><div class="scd">min 4 req.</div></div><div class="sc"><div class="scl">LTI Free Days</div><div class="scv">${cfg.lti_free_days||0}</div><div class="scd">count</div></div><div class="sc"><div class="scl">Score</div><div class="scv" style="color:${score>=90?'var(--ok)':score>=75?'var(--wa)':'var(--er)'}">${score}%</div><div class="scd">${score>=90?'Excellent':score>=75?'Acceptable':'Review'}</div></div>`;
+    if(ki)ki.innerHTML=`<div class="sc"><div class="scl">Near Misses 30d</div><div class="scv">${nm}</div><div class="scd">−${nm*2} pts</div></div><div class="sc"><div class="scl">Drills 90d</div><div class="scv">${dr}</div><div class="scd">min 4 req.</div></div><div class="sc"><div class="scl">LTI Free Days</div><div class="scv">${ltiDays}</div><div class="scd">count</div></div><div class="sc"><div class="scl">Score</div><div class="scv" style="color:${score>=90?'var(--ok)':score>=75?'var(--wa)':'var(--er)'}">${score}%</div><div class="scd">${score>=90?'Excellent':score>=75?'Acceptable':'Review'}</div></div>`;
     // schedule
     const ds=document.getElementById('dash-sched');
     if(ds){try{const sc=JSON.parse(cfg.schedule||'[]');ds.innerHTML=sc.length?`<table class="dt">${sc.map(s=>`<tr><td style="font-family:var(--m);font-size:11px;color:var(--ac);width:48px;">${s.time}</td><td style="font-size:12px;">${s.task}</td></tr>`).join('')}</table>`:'<div style="font-size:12px;color:var(--tx2);">No schedule set.</div>';}catch{}}
@@ -1299,12 +1326,12 @@ async function loadChecklists(){
     const tmpls=await sGet('cv_checklist_templates','?active=eq.true&order=category.asc,title.asc&select=*');
     if(!tmpls.length){list.innerHTML='<div style="font-size:12px;color:var(--tx2);">No checklist templates. Admin can create templates.</div>';return;}
     // group by category
-    const cats={};
-    tmpls.forEach(t=>{if(!cats[t.category])cats[t.category]=[];cats[t.category].push(t);});
+    _allTemplates={}; const cats={};
+    tmpls.forEach(t=>{_allTemplates[t.id]=t; if(!cats[t.category])cats[t.category]=[];cats[t.category].push(t);});
     list.innerHTML=Object.entries(cats).map(([cat,items])=>`
       <div style="margin-bottom:14px;">
         <div style="font-size:10px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;padding:5px 10px;background:var(--acb);border-radius:var(--r);">${cat}</div>
-        ${items.map(t=>`<div class="rc" style="cursor:pointer;" onclick="startChecklist(${JSON.stringify(JSON.stringify(t))})">
+        ${items.map(t=>`<div class="rc" style="cursor:pointer;" onclick="startChecklistById('${t.id}')">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div><div class="rtl">${t.title}</div><div class="rmt">${t.description||''} · ${(Array.isArray(t.items)?t.items:(Array.isArray(t.items)?t.items:(typeof t.items==='string'?JSON.parse(t.items||'[]'):[]))).length} questions</div></div>
             <button class="bs p" style="font-size:11px;padding:5px 11px;">Start ▶</button>
@@ -1314,8 +1341,9 @@ async function loadChecklists(){
   }catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
   loadClSubs();
 }
-function startChecklist(encoded){
-  _clTemplate=JSON.parse(JSON.parse(encoded));
+function startChecklistById(id){const t=_allTemplates[id];if(!t){alert("Template not found. Please refresh.");return;}startChecklist(t);}
+function startChecklist(t){
+  _clTemplate=t;
   _clAnswers={};
   document.getElementById('cl-fill-title').textContent=_clTemplate.title;
   document.getElementById('cl-fill-cat').textContent=_clTemplate.category+' — '+(_clTemplate.description||'');
@@ -1597,7 +1625,8 @@ async function submitRep(){
   try{
     const id='INC-'+Date.now();
     const incType=document.getElementById('rp-t').value;
-    await sPost('cv_incidents',{id,incident_type:incType,incident_datetime:document.getElementById('rp-d').value||null,location:document.getElementById('rp-l').value,reported_by:document.getElementById('rp-b').value||'Anonymous',description:d,immediate_actions:document.getElementById('rp-a').value,status:'under-review'});
+    const initHistory=[{status:'created',by:CU.full_name,rank:CU.rank,remarks:'Incident created',at:new Date().toISOString()}];
+    await sPost('cv_incidents',{id,incident_type:incType,incident_datetime:document.getElementById('rp-d').value||null,location:document.getElementById('rp-l').value,reported_by:document.getElementById('rp-b').value||CU.full_name,description:d,immediate_actions:document.getElementById('rp-a').value,severity:document.getElementById('rp-sev')?.value||null,department:document.getElementById('rp-dept')?.value||null,status:'created',status_history:JSON.stringify(initHistory)});
     // Auto-reset LTI if injury type
     if(incType==='Minor Injury'||incType==='Serious Injury'){
       const today=new Date().toISOString().split('T')[0];
@@ -1612,10 +1641,22 @@ async function loadReps(){
   const list=document.getElementById('rep-list');if(!list)return;
   list.innerHTML='<div class="loading"><div class="spin"></div>Loading...</div>';
   try{
-    const reps=await sGet('cv_incidents','?order=created_at.desc&select=*');
-    if(!reps.length){list.innerHTML='<div style="font-size:12px;color:var(--tx2);">No reports yet.</div>';return;}
-    list.innerHTML=reps.map(r=>`<div class="rc"><div class="rt"><div style="flex:1;"><div class="rid">${r.id} · ${new Date(r.created_at).toLocaleString()}</div><div class="rtl">${r.incident_type}</div><div class="rmt">${r.location||'—'} · By: ${r.reported_by}</div></div><div class="ra">${CU.is_admin?`<select class="sst" onchange="chRep('${r.id}',this.value)"><option value="under-review" ${r.status==='under-review'?'selected':''}>Under Review</option><option value="investigating" ${r.status==='investigating'?'selected':''}>Investigating</option><option value="closed" ${r.status==='closed'?'selected':''}>Closed</option></select>`:`<span class="b ${r.status==='closed'?'bg':'ba'}">${r.status}</span>`}<button class="abt" onclick="togRex('rex-${r.id}');loadRepImgs('${r.id}')">▾</button></div></div><div class="rex" id="rex-${r.id}"><div style="font-size:12px;color:var(--tx2);">${r.description}</div>${r.immediate_actions?`<div style="font-size:12px;color:var(--tx2);margin-top:5px;"><b>Actions:</b> ${r.immediate_actions}</div>`:''}<div id="rep-imgs-${r.id}" style="margin-top:7px;"></div></div></div>`).join('');
-  }catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error.</div>';}
+    let q='?order=created_at.desc&select=*';
+    const fs=document.getElementById('rep-f-status')?.value;
+    const ft=document.getElementById('rep-f-type')?.value;
+    if(fs)q+='&status=eq.'+encodeURIComponent(fs);
+    if(ft)q+='&incident_type=eq.'+encodeURIComponent(ft);
+    const reps=await sGet('cv_incidents',q);
+    if(!reps.length){list.innerHTML='<div style="font-size:12px;color:var(--tx2);">No reports found.</div>';return;}
+    list.innerHTML=reps.map(r=>{
+      const next=incNextStatus(r.incident_type,r.status||'created');
+      const canAdv=next&&incCanAdvance(r.incident_type,r.status||'created',CU.rank);
+      const statusBar=renderStatusBar(r.incident_type,r.status||'created');
+      const history=r.status_history?JSON.parse(r.status_history):[];
+      const histHtml=history.length?'<div style="margin-top:8px;">'+history.map(h=>`<div style="padding:4px 8px;background:var(--bg3);border-radius:var(--r);margin-bottom:3px;font-size:11px;"><span class="b bgr" style="font-size:9px;">${INC_STATUS_LABELS[h.status]||h.status}</span> <b>${h.by}</b> (${h.rank}) — ${new Date(h.at).toLocaleString()}<br/><span style="color:var(--tx2);">${h.remarks}</span></div>`).join('')+'</div>':'';
+      return`<div class="rc"><div class="rt"><div style="flex:1;"><div class="rid">${r.id} · ${new Date(r.created_at).toLocaleString()}</div><div class="rtl">${r.incident_type}</div><div class="rmt">${r.location||'—'} · By: ${r.reported_by}</div></div><div class="ra"><span class="b ${INC_STATUS_COLORS[r.status||'created']||'bgr'}">${INC_STATUS_LABELS[r.status||'created']||r.status}</span>${canAdv?`<button class="abt" style="color:var(--ac);font-size:11px;" onclick="openIncTrans('${r.id}','${r.incident_type}','${r.status||'created'}','${r.id}')">→ Advance</button>`:''}<button class="abt" onclick="togRex('rex-${r.id}');loadRepImgs('${r.id}')">▾</button></div></div>${statusBar}<div class="rex" id="rex-${r.id}"><div style="font-size:12px;color:var(--tx2);">${r.description||''}</div>${r.immediate_actions?`<div style="font-size:12px;color:var(--tx2);margin-top:5px;"><b>Actions:</b> ${r.immediate_actions}</div>`:''}<div id="rep-imgs-${r.id}" style="margin-top:7px;"></div>${histHtml}</div></div>`;
+    }).join('');
+  }catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
 }
 async function loadRepImgs(id){
   const el=document.getElementById('rep-imgs-'+id);if(!el||el.innerHTML)return;
@@ -1887,11 +1928,12 @@ function addSchedRow(){schedRows.push({time:'08:00',task:''});renderSched();}
 async function saveSched(){try{await sPatch('cv_config','?key=eq.schedule',{value:JSON.stringify(schedRows),updated_at:new Date().toISOString()});smsg('sched-msg','Saved.','ok');}catch(e){smsg('sched-msg','Error: '+e.message,'er');}}
 
 async function loadAdmUsers(){const list=document.getElementById('users-list');if(!list)return;try{const users=await sGet('cv_users','?order=created_at.asc&select=*');const today=new Date().toISOString().split('T')[0];
+    users.forEach(u=>{_allUsers[u.id]=u;});
     list.innerHTML=users.length?`<table class="dt"><thead><tr><th>Username</th><th>Name</th><th>Rank</th><th>Status</th><th>Until</th><th>Actions</th></tr></thead><tbody>`+users.map(u=>{
       const blocked=u.is_blocked;
       const expired=u.onboard_until&&u.onboard_until<today;
       const statusBadge=blocked?'<span class="b br">Blocked</span>':expired?'<span class="b ba">Expired</span>':'<span class="b bg">Active</span>';
-      return`<tr style="${blocked||expired?'opacity:.65':''}"><td style="font-family:var(--m);font-size:11px;">${u.username}</td><td>${u.full_name}</td><td>${u.rank}</td><td>${statusBadge}</td><td style="font-size:10px;color:var(--tx3);">${u.onboard_until||'—'}</td><td style="display:flex;gap:4px;flex-wrap:wrap;"><button class="abt" onclick="resetPW('${u.id}','${u.username}')">PW</button><button class="abt" onclick="openUserMgmt(${JSON.stringify(JSON.stringify(u))})">Manage</button></td></tr>`;
+      return`<tr style="${blocked||expired?'opacity:.65':''}"><td style="font-family:var(--m);font-size:11px;">${u.username}</td><td>${u.full_name}</td><td>${u.rank}</td><td>${statusBadge}</td><td style="font-size:10px;color:var(--tx3);">${u.onboard_until||'—'}</td><td style="display:flex;gap:4px;flex-wrap:wrap;"><button class="abt" onclick="resetPW('${u.id}','${u.username}')">PW</button><button class="abt" onclick="openUserMgmtById('${u.id}')">Manage</button></td></tr>`;
     }).join('')+'</tbody></table>':'<div style="font-size:12px;color:var(--tx2);">No users.</div>';}catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error.</div>';}}
 async function resetPW(uid,uname){const pw=prompt(`New password for ${uname} (min 6):`);if(!pw||pw.length<6){alert('Too short.');return;}await sPatch('cv_users',`?id=eq.${uid}`,{password_hash:btoa(pw)});alert('Reset for '+uname);}
 
@@ -2108,8 +2150,8 @@ async function saveCrewLog(){
 }
 
 // ===== USER MANAGEMENT =====
-function openUserMgmt(encoded){
-  const u=JSON.parse(JSON.parse(encoded));
+function openUserMgmtById(id){const u=_allUsers[id];if(!u){alert("Please reload user list.");return;}openUserMgmt(u);}
+function openUserMgmt(u){
   document.getElementById('mgmt-uid').value=u.id;
   document.getElementById('user-mgmt-title').innerHTML=`Manage: ${u.full_name} <button class="mc" onclick="cm('user-mgmt-mo')">✕</button>`;
   document.getElementById('mgmt-user-info').innerHTML=`<div style="font-size:12px;"><b>${u.full_name}</b> · ${u.rank}<br/>Username: ${u.username} · Admin: ${u.is_admin?'Yes':'No'}<br/>Status: ${u.is_blocked?'<span style="color:var(--er);">BLOCKED</span>':'<span style="color:var(--ok);">Active</span>'} · Until: ${u.onboard_until||'No limit set'}</div>`;
@@ -2141,6 +2183,148 @@ async function saveUserMgmt(action){
     setTimeout(loadAdmUsers,1500);
   }catch(e){smsg('mgmt-msg','Error: '+e.message,'er');}
 }
+
+// ===== INCIDENT STATUS SYSTEM =====
+const INC_FLOW_FULL=['created','reported','reviewed','investigated','capa_verified','closed'];
+const INC_FLOW_SIMPLE=['created','reviewed','closed'];
+const INC_FULL_TYPES=['Near Miss','Minor Injury','Serious Injury','Property Damage','Environmental'];
+const INC_STATUS_LABELS={'created':'Created','reported':'Reported','reviewed':'Reviewed','investigated':'Investigated','capa_verified':'CAPA Verified','closed':'Closed'};
+const INC_STATUS_COLORS={'created':'bgr','reported':'bb','reviewed':'ba','investigated':'bpu','capa_verified':'bg','closed':'bgr'};
+
+function incFlow(type){return INC_FULL_TYPES.includes(type)?INC_FLOW_FULL:INC_FLOW_SIMPLE;}
+function incNextStatus(type,current){const flow=incFlow(type);const idx=flow.indexOf(current);return idx>=0&&idx<flow.length-1?flow[idx+1]:null;}
+function incCanAdvance(type,current,userRank){
+  const next=incNextStatus(type,current);if(!next)return false;
+  // capa_verified → closed: Shore Staff only
+  if(next==='closed')return userRank==='Shore Staff';
+  // capa_verified: Shore Staff only  
+  if(next==='capa_verified')return userRank==='Shore Staff';
+  // Others: Master, Chief Officer, Shore Staff
+  return ['Master (Captain)','Chief Officer','Shore Staff'].includes(userRank);
+}
+
+function updateIncFlowInfo(){
+  const t=document.getElementById('rp-t')?.value;
+  const el=document.getElementById('rp-flow-info');if(!el)return;
+  if(INC_FULL_TYPES.includes(t)){
+    el.innerHTML='📋 <b>Full workflow:</b> Created → Reported → Reviewed → Investigated → CAPA Verified → Closed (Shore Staff closes)';
+    el.style.borderColor='var(--ac)';el.style.background='var(--acb)';
+  } else {
+    el.innerHTML='📋 <b>Simple workflow:</b> Created → Reviewed → Closed';
+    el.style.borderColor='var(--okd)';el.style.background='var(--okb)';
+  }
+}
+
+function renderStatusBar(type,current){
+  const flow=incFlow(type);
+  return '<div style="display:flex;gap:3px;margin:10px 0;flex-wrap:nowrap;overflow-x:auto;">'+
+    flow.map(s=>{
+      const idx=flow.indexOf(s);
+      const curIdx=flow.indexOf(current);
+      const done=idx<curIdx;const active=s===current;
+      const bg=active?'var(--ac)':done?'var(--ok)':'var(--bg3)';
+      const col=active||done?'#fff':'var(--tx2)';
+      return`<div style="flex:1;min-width:60px;padding:5px 3px;background:${bg};color:${col};border-radius:4px;text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">${INC_STATUS_LABELS[s]||s}</div>`;
+    }).join('<div style="width:6px;height:24px;background:var(--bd);align-self:center;flex-shrink:0;margin-top:5px;"></div>')+
+  '</div>';
+}
+
+function openIncTrans(incId,incType,currentStatus,incTitle){
+  const next=incNextStatus(incType,currentStatus);
+  if(!next){alert('No further status available.');return;}
+  if(!incCanAdvance(incType,currentStatus,CU.rank)){
+    if(next==='closed'||next==='capa_verified')alert('Only Shore Staff can advance to '+INC_STATUS_LABELS[next]+'.');
+    else alert('Only Master, Chief Officer or Shore Staff can advance status.');
+    return;
+  }
+  document.getElementById('inc-trans-id').value=incId;
+  document.getElementById('inc-trans-next').value=next;
+  document.getElementById('inc-trans-title').innerHTML=`Advance: ${INC_STATUS_LABELS[currentStatus]} → ${INC_STATUS_LABELS[next]} <button class="mc" onclick="cm('inc-trans-mo')">✕</button>`;
+  document.getElementById('inc-trans-info').innerHTML=`<b>Incident:</b> ${incTitle}<br/><b>Current:</b> ${INC_STATUS_LABELS[currentStatus]} → <b>Next:</b> <span style="color:var(--ac);font-weight:600;">${INC_STATUS_LABELS[next]}</span><br/><span style="font-size:10px;color:var(--tx3);">Your remarks and evidence will be permanently logged.</span>`;
+  document.getElementById('inc-trans-remarks').value='';
+  document.getElementById('inc-ev-prev').innerHTML='';
+  cm('inc-trans-mo');setTimeout(()=>om('inc-trans-mo'),10);
+}
+
+async function confirmIncTrans(){
+  const id=document.getElementById('inc-trans-id').value;
+  const next=document.getElementById('inc-trans-next').value;
+  const remarks=document.getElementById('inc-trans-remarks').value.trim();
+  if(!remarks){smsg('inc-trans-msg','Remarks are required to advance status.','er');return;}
+  smsg('inc-trans-msg','Saving...','ok');
+  try{
+    // Build status history entry
+    const incs=await sGet('cv_incidents',`?id=eq.${id}&select=*`);
+    if(!incs.length){smsg('inc-trans-msg','Incident not found.','er');return;}
+    const inc=incs[0];
+    const history=inc.status_history?JSON.parse(inc.status_history):[];
+    history.push({status:next,by:CU.full_name,rank:CU.rank,remarks,at:new Date().toISOString()});
+    await sPatch('cv_incidents',`?id=eq.${id}`,{status:next,status_history:JSON.stringify(history),updated_at:new Date().toISOString()});
+    // Upload evidence images
+    for(const f of pendingRep){const url=await uploadImg(f);await sPost('cv_incident_images',{incident_id:id,image_url:url,created_by:CU.full_name,caption:remarks.substring(0,50)});}
+    pendingRep=[];document.getElementById('inc-ev-prev').innerHTML='';
+    cm('inc-trans-mo');
+    loadReps();
+  }catch(e){smsg('inc-trans-msg','Error: '+e.message,'er');}
+}
+
+// ===== MUSTER ASSIGNMENT ADMIN =====
+async function loadAdmMusterAssign(){
+  const list=document.getElementById('adm-mra-list');if(!list)return;
+  list.innerHTML='<div class="loading"><div class="spin"></div>Loading...</div>';
+  try{
+    const rows=await sGet('cv_muster_assignments','?order=sort_order.asc&select=*');
+    if(!rows.length){list.innerHTML='<div style="font-size:12px;color:var(--tx2);">No assignments. Click "+ Add Rank" to create.</div>';return;}
+    list.innerHTML=rows.map(r=>`
+      <div style="display:flex;gap:8px;padding:8px 0;border-bottom:.5px solid var(--bd);align-items:center;">
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:500;">${r.rank}</div>
+          <div style="font-size:11px;color:var(--tx2);">${r.muster_station||'—'} · ${r.lifeboat||'—'} · <span class="b ${r.department==='DECK'?'bb':r.department==='ENGINE'?'ba':'bgr'}">${r.department}</span></div>
+        </div>
+        <button class="abt" onclick="editMusterAssign(${JSON.stringify(JSON.stringify(r))})">Edit</button>
+        <button class="abt" style="color:var(--er);" onclick="delMusterAssign('${r.id}')">Del</button>
+      </div>`).join('');
+  }catch(e){list.innerHTML='<div style="color:var(--er);font-size:12px;">Error: '+e.message+'</div>';}
+}
+
+function newMusterAssign(){
+  ['mra-id','mra-rank','mra-station','mra-lifeboat','mra-lb-role','mra-fire','mra-oil','mra-mob','mra-dam','mra-steer'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('mra-sort').value='99';
+  document.getElementById('mra-title').innerHTML='Add Muster Assignment <button class="mc" onclick="cm('mra-mo')">✕</button>';
+  om('mra-mo');
+}
+
+function editMusterAssign(enc){
+  const r=JSON.parse(JSON.parse(enc));
+  document.getElementById('mra-id').value=r.id;
+  document.getElementById('mra-rank').value=r.rank||'';
+  document.getElementById('mra-station').value=r.muster_station||'';
+  document.getElementById('mra-lifeboat').value=r.lifeboat||'';
+  document.getElementById('mra-lb-role').value=r.lifeboat_role||'';
+  document.getElementById('mra-fire').value=r.fire_role||'';
+  document.getElementById('mra-oil').value=r.oil_pollution_role||'';
+  document.getElementById('mra-mob').value=r.mob_rescue_role||'';
+  document.getElementById('mra-dam').value=r.damage_control||'';
+  document.getElementById('mra-steer').value=r.emergency_steering||'';
+  document.getElementById('mra-dept').value=r.department||'DECK';
+  document.getElementById('mra-sort').value=r.sort_order||99;
+  document.getElementById('mra-title').innerHTML='Edit: '+r.rank+' <button class="mc" onclick="cm('mra-mo')">✕</button>';
+  om('mra-mo');
+}
+
+async function saveMusterAssign(){
+  const rank=document.getElementById('mra-rank').value.trim();
+  if(!rank){alert('Rank is required.');return;}
+  const data={rank,muster_station:document.getElementById('mra-station').value,lifeboat:document.getElementById('mra-lifeboat').value,lifeboat_role:document.getElementById('mra-lb-role').value,fire_role:document.getElementById('mra-fire').value,oil_pollution_role:document.getElementById('mra-oil').value,mob_rescue_role:document.getElementById('mra-mob').value,damage_control:document.getElementById('mra-dam').value,emergency_steering:document.getElementById('mra-steer').value,department:document.getElementById('mra-dept').value,sort_order:+document.getElementById('mra-sort').value||99};
+  try{
+    const eid=document.getElementById('mra-id').value;
+    if(eid)await sPatch('cv_muster_assignments',`?id=eq.${eid}`,data);
+    else await sPost('cv_muster_assignments',{...data});
+    cm('mra-mo');loadAdmMusterAssign();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function delMusterAssign(id){if(!confirm('Delete this assignment?'))return;await sDel('cv_muster_assignments',`?id=eq.${id}`);loadAdmMusterAssign();}
 
 // ===== AUTO LOGIN =====
 window.addEventListener('load',()=>{
@@ -2196,5 +2380,44 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementB
   </div>
 </div></div>
 
+
+<!-- INCIDENT TRANSITION MODAL -->
+<div class="mo" id="inc-trans-mo"><div class="md">
+  <h3 id="inc-trans-title">Advance Status <button class="mc" onclick="cm('inc-trans-mo')">✕</button></h3>
+  <input type="hidden" id="inc-trans-id"/>
+  <input type="hidden" id="inc-trans-next"/>
+  <div id="inc-trans-info" style="background:var(--bg3);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;font-size:12px;"></div>
+  <div class="fr full"><div class="fg"><label>Remarks / Actions Taken (required)</label><textarea id="inc-trans-remarks" placeholder="Describe what was done at this stage — this is logged and cannot be changed."></textarea></div></div>
+  <div class="fg"><label>Attach Evidence (optional)</label>
+    <div class="iua" onclick="document.getElementById('inc-ev-inp').click()">
+      <input type="file" id="inc-ev-inp" accept="image/*" multiple onchange="prevImgs(this,'inc-ev-prev','rep')"/>
+      <div style="font-size:12px;color:var(--tx2);">📎 Attach photos or documents</div>
+    </div>
+    <div class="ig2" id="inc-ev-prev"></div>
+  </div>
+  <div id="inc-trans-msg" class="fm"></div>
+  <div class="brow">
+    <button class="bs p" onclick="confirmIncTrans()">Confirm &amp; Advance</button>
+    <button class="bs" onclick="cm('inc-trans-mo')">Cancel</button>
+  </div>
+</div></div>
+
+<!-- MUSTER ASSIGNMENT EDIT MODAL (Admin) -->
+<div class="mo" id="mra-mo"><div class="md" style="max-width:700px;">
+  <h3 id="mra-title">Edit Muster Assignment <button class="mc" onclick="cm('mra-mo')">✕</button></h3>
+  <input type="hidden" id="mra-id"/>
+  <div class="fr"><div class="fg"><label>Rank</label><input id="mra-rank" type="text"/></div>
+    <div class="fg"><label>Department</label><select id="mra-dept"><option>DECK</option><option>ENGINE</option><option>CATERING</option><option>SHORE</option></select></div></div>
+  <div class="fr"><div class="fg"><label>Muster Station</label><input id="mra-station" type="text"/></div>
+    <div class="fg"><label>Lifeboat</label><input id="mra-lifeboat" type="text"/></div></div>
+  <div class="fr full"><div class="fg"><label>Lifeboat Duty</label><textarea id="mra-lb-role" style="min-height:50px;"></textarea></div></div>
+  <div class="fr full"><div class="fg"><label>Fire / Explosion Duty</label><textarea id="mra-fire" style="min-height:50px;"></textarea></div></div>
+  <div class="fr full"><div class="fg"><label>Oil Pollution Role</label><textarea id="mra-oil" style="min-height:50px;"></textarea></div></div>
+  <div class="fr full"><div class="fg"><label>MOB / Rescue Boat</label><textarea id="mra-mob" style="min-height:50px;"></textarea></div></div>
+  <div class="fr full"><div class="fg"><label>Damage Control</label><textarea id="mra-dam" style="min-height:50px;"></textarea></div></div>
+  <div class="fr full"><div class="fg"><label>Emergency Steering</label><textarea id="mra-steer" style="min-height:50px;"></textarea></div></div>
+  <div class="fr"><div class="fg"><label>Sort Order</label><input id="mra-sort" type="number" value="99"/></div></div>
+  <div class="brow"><button class="bs p" onclick="saveMusterAssign()">Save</button><button class="bs" onclick="cm('mra-mo')">Cancel</button></div>
+</div></div>
 </body>
 </html>
